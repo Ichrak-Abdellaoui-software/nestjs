@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
-import { DepartmentsService } from './departments.service';
-import { DepartmentDto } from './dto/departments.dto';
+import { PolesService } from './poles.service';
+import { PoleDto } from './dto/poles.dto';
 
-@Controller('departments')
-export class DepartmentsController {
+@Controller('poles')
+export class PolesController {
     
-  constructor(private readonly service: DepartmentsService) {}
+  constructor(private readonly service: PolesService) {}
   @Post()
-  add(@Body() body : DepartmentDto) {
+  add(@Body() body : PoleDto) {
     return this.service.add(body);
   }
   @Get()
@@ -21,7 +21,7 @@ export class DepartmentsController {
     return this.service.getOne(id);
   }
   @Put('/:id')
-  update(@Param('id') id: string , @Body() body:DepartmentDto) {
+  update(@Param('id') id: string , @Body() body:PoleDto) {
     return this.service.update(id, body);
   }
   @Delete('/:id')
