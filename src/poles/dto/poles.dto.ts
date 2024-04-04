@@ -1,8 +1,11 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
-export class TechDto {
+export class PoleDto {
   @IsNotEmpty()
   name: string;
   @IsOptional()
   image?: string;
+
+  //   members:
+  //   teamManager:
 }

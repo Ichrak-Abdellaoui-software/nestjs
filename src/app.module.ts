@@ -4,10 +4,12 @@ import { UsersModule } from './users/users.module';
 import { QuestionsModule } from './questions/questions.module';
 import { AnswersModule } from './answers/answers.module';
 import { CommentsModule } from './comments/comments.module';
-import { DepartmentsModule } from './departments/departments.module';
+import { PolesModule } from './poles/poles.module';
 import { TechsModule } from './techs/techs.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ProfileModule } from './profile/profile.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -18,8 +20,10 @@ import { MongooseModule } from '@nestjs/mongoose';
     QuestionsModule,
     AnswersModule,
     CommentsModule,
-    DepartmentsModule,
+    PolesModule,
     TechsModule,
+    ProfileModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}
