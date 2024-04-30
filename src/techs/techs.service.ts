@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable } from '@nestjs/common';
 import { Tech } from './models/techs.models';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -8,13 +8,21 @@ import { TechDto } from './dto/techs.dto';
 @Injectable()
 export class TechsService {
   constructor(@InjectModel(Tech.name) private TechModel: Model<Tech>) {}
-  add(body: TechDto) {
-    return this.TechModel.create(body);
+  async add(body: TechDto) {
+    try {
+      return await this.TechModel.create(body);
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Tech name is already taken');
+      }
+
+      throw error;
+    }
   }
-  getAll() {
+  findAll() {
     return this.TechModel.find();
   }
-  getOne(id: string) {
+  findOne(id: string) {
     //return this.TechModel.findOne({ _id: id });
     return this.TechModel.findById(id);
   }

@@ -13,12 +13,12 @@ export class PolesController {
     return this.service.add(body);
   }
   @Get()
-  getAll() {
-    return this.service.getAll();
+  findAll() {
+    return this.service.findAll();
   }
   @Get('/:id')
-  getOne(@Param('id') id: string) {
-    return this.service.getOne(id);
+  findOne(@Param('id') id: string) {
+    return this.service.findOne(id);
   }
   @Put('/:id')
   update(@Param('id') id: string , @Body() body:PoleDto) {

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Body, Injectable } from '@nestjs/common';
+import { BadRequestException, Body, Injectable } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PoleDto } from './dto/poles.dto';
@@ -7,13 +7,21 @@ import { Pole } from './models/poles.models';
 @Injectable()
 export class PolesService {
   constructor(@InjectModel(Pole.name) private PoleModel: Model<Pole>) {}
-  add(body: PoleDto) {
-    return this.PoleModel.create(body);
+  async add(body: PoleDto) {
+    try {
+      return await this.PoleModel.create(body);
+    } catch (error) {
+      if (error.code === 11000) {
+        throw new BadRequestException('Pole name is already taken');
+      }
+
+      throw error;
+    }
   }
-  getAll() {
+  findAll() {
     return this.PoleModel.find();
   }
-  getOne(id: string) {
+  findOne(id: string) {
     //return this.PoleModel.findOne({ _id: id });
     return this.PoleModel.findById(id);
   }

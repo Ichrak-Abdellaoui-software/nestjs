@@ -4,19 +4,33 @@ import { Question } from './models/questions.models';
 import { Model } from 'mongoose';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { Tech } from 'src/techs/models/techs.models';
 
 @Injectable()
 export class QuestionsService {
   constructor(
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
+    @InjectModel(Tech.name) private TechModel: Model<Tech>,
   ) {}
-  add(body: CreateQuestionDto) {
-    return this.QuestionModel.create(body);
+  async add(body: CreateQuestionDto) {
+    const question = await this.QuestionModel.create(body);
+    await Promise.all(
+      body.techs.map((techId) =>
+        this.TechModel.findByIdAndUpdate(
+          techId,
+          { $addToSet: { questions: question._id } },
+          { new: true },
+        ),
+      ), // test with JSON not Form-Encode ( sinon problem f array )
+    );
+
+    return question;
   }
-  getAll() {
+
+  findAll() {
     return this.QuestionModel.find();
   }
-  getOne(id: string) {
+  findOne(id: string) {
     //return this.QuestionModel.findOne({ _id: id });
     return this.QuestionModel.findById(id);
   }

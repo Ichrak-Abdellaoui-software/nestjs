@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { MinLength } from 'class-validator';
 import { Document, Types } from 'mongoose';
 import { UserRoles } from 'src/enums/user-roles.enum';
 import { Question } from 'src/questions/models/questions.models';
@@ -7,19 +8,20 @@ export type UserDocument = User & Document;
 
 @Schema({ timestamps: true })
 export class User {
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true })
   fullname: string;
 
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: true }) //, select: false
+  @Prop({ required: false }) //, select: true
+  @MinLength(8)
   password: string;
 
   @Prop({ type: Types.ObjectId, ref: 'Pole', required: true })
   pole: Types.ObjectId;
 
-  @Prop({ required: true, enum: UserRoles, default: UserRoles.USER })
+  @Prop({ enum: UserRoles, default: UserRoles.USER })
   role: UserRoles;
 
   @Prop()

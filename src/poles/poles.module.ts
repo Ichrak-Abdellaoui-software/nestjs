@@ -10,5 +10,8 @@ import { Pole, PoleSchema } from './models/poles.models';
   ],
   providers: [PolesService],
   controllers: [PolesController],
+  exports: [
+    MongooseModule.forFeature([{ name: Pole.name, schema: PoleSchema }]),
+  ],
 })
 export class PolesModule {}
