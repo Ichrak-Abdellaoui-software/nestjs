@@ -10,5 +10,8 @@ import { Tech, TechSchema } from './models/techs.models';
   ],
   providers: [TechsService],
   controllers: [TechsController],
+  exports: [
+    MongooseModule.forFeature([{ name: Tech.name, schema: TechSchema }]),
+  ],
 })
 export class TechsModule {}
