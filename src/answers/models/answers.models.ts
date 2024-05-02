@@ -33,10 +33,10 @@ export class Answer {
   comments: Types.ObjectId[];
 
   @Prop({ type: Number, default: 0 })
-  upvotes: number;
+  likes: number;
 
   @Prop({ type: Number, default: 0 })
-  downvotes: number;
+  dislikes: number;
 
   @Prop({ enum: AnswerStatus, default: AnswerStatus.PENDING })
   status: AnswerStatus;

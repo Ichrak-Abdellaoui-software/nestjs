@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsMongoId, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsMongoId } from 'class-validator';
 import { Types } from 'mongoose';
 import { CommentStatus } from 'src/enums/comment-status.enum';
 
@@ -21,14 +21,6 @@ export class CreateCommentDto {
   @IsMongoId()
   @IsNotEmpty()
   answer: Types.ObjectId;
-
-  @Min(0)
-  @IsOptional()
-  upvotes: number;
-
-  @Min(0)
-  @IsOptional()
-  downvotes: number;
 
   @IsOptional()
   status: CommentStatus;
