@@ -3,6 +3,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { TechsService } from './techs.service';
 import { TechDto } from './dto/techs.dto';
+import { UpdateTechDto } from './dto/update-tech.dto';
 
 @Controller('techs')
 export class TechsController {
@@ -20,7 +21,7 @@ export class TechsController {
     return this.service.findOne(id);
   }
   @Put('/:id')
-  update(@Param('id') id: string , @Body() body:TechDto) {
+  update(@Param('id') id: string , @Body() body:UpdateTechDto) {
     return this.service.update(id, body);
   }
   @Delete('/:id')

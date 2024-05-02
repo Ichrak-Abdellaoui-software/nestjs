@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { PoleDto } from './dto/poles.dto';
 import { Pole } from './models/poles.models';
+import { UpdatePoleDto } from './dto/uodate-pole.dto';
 @Injectable()
 export class PolesService {
   constructor(@InjectModel(Pole.name) private PoleModel: Model<Pole>) {}
@@ -28,7 +29,7 @@ export class PolesService {
   delete(id: string) {
     return this.PoleModel.findByIdAndDelete({ _id: id });
   }
-  update(id: string, body: PoleDto) {
+  update(id: string, body: UpdatePoleDto) {
     return this.PoleModel.findOneAndUpdate(
       { _id: id },
       { $set: body },

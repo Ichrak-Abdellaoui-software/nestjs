@@ -3,6 +3,7 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query } from '@nestjs/common';
 import { PolesService } from './poles.service';
 import { PoleDto } from './dto/poles.dto';
+import { UpdatePoleDto } from './dto/uodate-pole.dto';
 
 @Controller('poles')
 export class PolesController {
@@ -21,7 +22,7 @@ export class PolesController {
     return this.service.findOne(id);
   }
   @Put('/:id')
-  update(@Param('id') id: string , @Body() body:PoleDto) {
+  update(@Param('id') id: string , @Body() body:UpdatePoleDto) {
     return this.service.update(id, body);
   }
   @Delete('/:id')

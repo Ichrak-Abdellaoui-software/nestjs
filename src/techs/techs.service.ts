@@ -4,6 +4,7 @@ import { Tech } from './models/techs.models';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TechDto } from './dto/techs.dto';
+import { UpdateTechDto } from './dto/update-tech.dto';
 
 @Injectable()
 export class TechsService {
@@ -29,7 +30,7 @@ export class TechsService {
   delete(id: string) {
     return this.TechModel.findByIdAndDelete({ _id: id });
   }
-  update(id: string, body: TechDto) {
+  update(id: string, body: UpdateTechDto) {
     return this.TechModel.findOneAndUpdate(
       { _id: id },
       { $set: body },
