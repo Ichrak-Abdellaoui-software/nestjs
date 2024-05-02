@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -24,7 +23,8 @@ export class CreateUserDto {
   @IsNotEmpty()
   pole: string;
 
-  @IsEnum(UserRoles)
+  //@IsEnum(UserRoles)
+  @IsOptional()
   role: UserRoles;
 
   @IsOptional()

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsMongoId, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsMongoId } from 'class-validator';
 import { Types } from 'mongoose';
 import { AnswerStatus } from 'src/enums/answer-status.enum';
 
@@ -26,13 +26,13 @@ export class CreateAnswerDto {
   @IsOptional()
   comments: Types.ObjectId[];
 
-  @Min(0)
-  @IsOptional()
-  upvotes: number;
+  // @Min(0)
+  // @IsOptional()
+  // likes: number;
 
-  @Min(0)
-  @IsOptional()
-  downvotes: number;
+  // @Min(0)
+  // @IsOptional()
+  // dislikes: number;
 
   @IsOptional()
   status: AnswerStatus;

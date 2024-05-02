@@ -43,4 +43,52 @@ export class CommentsService {
     const keyword = key ? { name: { $regex: key, $options: 'i' } } : {};
     return this.CommentModel.find(keyword);
   }
+
+  async like(commentId: string): Promise<number> {
+    const comment = await this.CommentModel.findByIdAndUpdate(
+      commentId,
+      { $inc: { likes: 1 } },
+      { new: true },
+    );
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+    return comment.likes;
+  }
+
+  async unlike(commentId: string): Promise<number> {
+    const comment = await this.CommentModel.findByIdAndUpdate(
+      commentId,
+      { $inc: { likes: -1 } },
+      { new: true },
+    );
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+    return comment.likes;
+  }
+
+  async dislike(commentId: string): Promise<number> {
+    const comment = await this.CommentModel.findByIdAndUpdate(
+      commentId,
+      { $inc: { dislikes: 1 } },
+      { new: true },
+    );
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+    return comment.dislikes;
+  }
+
+  async undislike(commentId: string): Promise<number> {
+    const comment = await this.CommentModel.findByIdAndUpdate(
+      commentId,
+      { $inc: { dislikes: -1 } },
+      { new: true },
+    );
+    if (!comment) {
+      throw new Error('Comment not found');
+    }
+    return comment.dislikes;
+  }
 }

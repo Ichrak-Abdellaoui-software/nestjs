@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -38,5 +39,29 @@ export class CommentsController {
   @Post('/search')
   search(@Query('key') key) {
     return this.service.search(key);
+  }
+
+  @Patch('/:id/like')
+  async like(@Param('id') id: string) {
+    const likes = await this.service.like(id);
+    return { likes };
+  }
+
+  @Patch('/:id/unlike')
+  async unlike(@Param('id') id: string) {
+    const likes = await this.service.unlike(id);
+    return { likes };
+  }
+
+  @Patch('/:id/dislike')
+  async dislike(@Param('id') id: string) {
+    const dislikes = await this.service.dislike(id);
+    return { dislikes };
+  }
+
+  @Patch('/:id/undislike')
+  async undislike(@Param('id') id: string) {
+    const dislikes = await this.service.undislike(id);
+    return { dislikes };
   }
 }

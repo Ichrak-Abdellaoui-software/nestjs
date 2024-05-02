@@ -48,4 +48,15 @@ export class QuestionsService {
     const keyword = key ? { name: { $regex: key, $options: 'i' } } : {};
     return this.QuestionModel.find(keyword);
   }
+  async incrementViews(id: string): Promise<number> {
+    //Promise<Question>
+    const question = await this.QuestionModel.findByIdAndUpdate(
+      id,
+      { $inc: { views: 1 } },
+      { new: true, runValidators: true },
+    );
+
+    // return question;
+    return question.views;
+  }
 }
