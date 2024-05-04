@@ -64,4 +64,16 @@ export class CommentsController {
     const dislikes = await this.service.undislike(id);
     return { dislikes };
   }
+
+  @Patch('/:id/approve')
+  async approve(@Param('id') id: string) {
+    const comment = await this.service.approveComment(id);
+    return { comment };
+  }
+
+  @Patch('/:id/disapprove')
+  async disapprove(@Param('id') id: string) {
+    const comment = await this.service.disapproveComment(id);
+    return comment;
+  }
 }

@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Answer } from './models/answers.models';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { Question } from 'src/questions/models/questions.models';
 import { AnswerStatus } from 'src/enums/answer-status.enum';
+import { QuestionStatus } from 'src/enums/question-status.enum';
+import { CommentStatus } from 'src/enums/comment-status.enum';
 
 @Injectable()
 export class AnswersService {
@@ -41,7 +43,7 @@ export class AnswersService {
     );
   }
   search(key: string) {
-    const keyword = key ? { name: { $regex: key, $options: 'i' } } : {};
+    const keyword = key ? { content: { $regex: key, $options: 'i' } } : {};
     return this.AnswerModel.find(keyword);
   }
   async like(answerId: string): Promise<number> {
@@ -51,7 +53,7 @@ export class AnswersService {
       { new: true },
     );
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
     return answer.likes;
   }
@@ -63,7 +65,7 @@ export class AnswersService {
       { new: true },
     );
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
     return answer.likes;
   }
@@ -75,7 +77,7 @@ export class AnswersService {
       { new: true },
     );
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
     return answer.dislikes;
   }
@@ -87,7 +89,7 @@ export class AnswersService {
       { new: true },
     );
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
     return answer.dislikes;
   }
@@ -99,27 +101,53 @@ export class AnswersService {
       { new: true },
     );
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: QuestionStatus.CLOSED } },
+      { new: true },
+    );
     return answer;
   }
 
   async disapproveAnswer(answerId: string): Promise<Answer> {
     const answer = await this.AnswerModel.findById(answerId);
-
     if (!answer) {
-      throw new Error('Answer not found');
+      throw new BadRequestException('Answer not found');
     }
-
     if (answer.status !== AnswerStatus.APPROVED) {
       throw new BadRequestException(
         'Cannot disapprove an answer that is not approved',
       );
     }
-
     answer.status = AnswerStatus.DISAPPROVED;
     await answer.save();
-
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: QuestionStatus.OPEN } },
+      { new: true },
+    );
     return answer;
+  }
+  async handleQuestionStatus(
+    answerId: Types.ObjectId,
+    status: CommentStatus,
+  ): Promise<void> {
+    const answer = await this.AnswerModel.findById(answerId).select('question');
+    if (!answer) {
+      throw new BadRequestException('Answer not found');
+    }
+
+    const newQuestionStatus =
+      status === CommentStatus.APPROVED
+        ? QuestionStatus.CLOSED
+        : QuestionStatus.OPEN;
+
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: newQuestionStatus } },
+      { new: true },
+    );
   }
 }
