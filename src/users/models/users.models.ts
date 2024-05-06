@@ -27,6 +27,15 @@ export class User {
   @Prop()
   avatar: string;
 
+  @Prop({ type: Number, default: 0 })
+  totalLikes: number;
+
+  @Prop({ type: Number, default: 0 })
+  totalDislikes: number;
+
+  @Prop({ type: Number, default: 0 })
+  totalApproved: number;
+
   @Prop([{ type: Types.ObjectId, ref: Question.name }])
   questions: Types.ObjectId[];
 }

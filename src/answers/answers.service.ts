@@ -8,12 +8,14 @@ import { Question } from 'src/questions/models/questions.models';
 import { AnswerStatus } from 'src/enums/answer-status.enum';
 import { QuestionStatus } from 'src/enums/question-status.enum';
 import { CommentStatus } from 'src/enums/comment-status.enum';
+import { User } from 'src/users/models/users.models';
 
 @Injectable()
 export class AnswersService {
   constructor(
     @InjectModel(Answer.name) private AnswerModel: Model<Answer>,
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
+    @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
   async add(body: CreateAnswerDto): Promise<Answer> {
     const answer = await this.AnswerModel.create(body);
@@ -55,6 +57,14 @@ export class AnswersService {
     if (!answer) {
       throw new BadRequestException('Answer not found');
     }
+    //incremnte totallikes
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalLikes: 1 } },
+        { new: true },
+      );
+    }
     return answer.likes;
   }
 
@@ -66,6 +76,13 @@ export class AnswersService {
     );
     if (!answer) {
       throw new BadRequestException('Answer not found');
+    }
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalLikes: -1 } },
+        { new: true },
+      );
     }
     return answer.likes;
   }
@@ -79,6 +96,13 @@ export class AnswersService {
     if (!answer) {
       throw new BadRequestException('Answer not found');
     }
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalDislikes: 1 } },
+        { new: true },
+      );
+    }
     return answer.dislikes;
   }
 
@@ -91,17 +115,34 @@ export class AnswersService {
     if (!answer) {
       throw new BadRequestException('Answer not found');
     }
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalDislikes: -1 } },
+        { new: true },
+      );
+    }
     return answer.dislikes;
   }
 
   async approveAnswer(answerId: string): Promise<Answer> {
-    const answer = await this.AnswerModel.findByIdAndUpdate(
-      answerId,
-      { $set: { status: AnswerStatus.APPROVED } },
-      { new: true },
-    );
+    const answer = await this.AnswerModel.findById(answerId);
+
     if (!answer) {
       throw new BadRequestException('Answer not found');
+    }
+    if (answer.status === AnswerStatus.APPROVED) {
+      throw new BadRequestException('This answer is already approved');
+    }
+    answer.status = AnswerStatus.APPROVED;
+    await answer.save();
+
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalApproved: 1 } },
+        { new: true },
+      );
     }
     await this.QuestionModel.findByIdAndUpdate(
       answer.question,
@@ -123,6 +164,13 @@ export class AnswersService {
     }
     answer.status = AnswerStatus.DISAPPROVED;
     await answer.save();
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalApproved: -1 } },
+        { new: true },
+      );
+    }
     await this.QuestionModel.findByIdAndUpdate(
       answer.question,
       { $set: { status: QuestionStatus.OPEN } },

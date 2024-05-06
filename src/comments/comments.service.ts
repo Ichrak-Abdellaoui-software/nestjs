@@ -7,12 +7,14 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Answer } from 'src/answers/models/answers.models';
 import { CommentStatus } from 'src/enums/comment-status.enum';
 import { AnswersService } from 'src/answers/answers.service';
+import { User } from 'src/users/models/users.models';
 
 @Injectable()
 export class CommentsService {
   constructor(
     @InjectModel(Comment.name) private CommentModel: Model<Comment>,
     @InjectModel(Answer.name) private AnswerModel: Model<Answer>,
+    @InjectModel(User.name) private UserModel: Model<User>,
     private answersService: AnswersService,
   ) {}
   async add(body: CreateCommentDto): Promise<Comment> {
@@ -56,6 +58,13 @@ export class CommentsService {
     if (!comment) {
       throw new BadRequestException('Comment not found');
     }
+    if (comment.author) {
+      await this.UserModel.findByIdAndUpdate(
+        comment.author,
+        { $inc: { totalLikes: 1 } },
+        { new: true },
+      );
+    }
     return comment.likes;
   }
 
@@ -67,6 +76,14 @@ export class CommentsService {
     );
     if (!comment) {
       throw new BadRequestException('Comment not found');
+    }
+
+    if (comment.author) {
+      await this.UserModel.findByIdAndUpdate(
+        comment.author,
+        { $inc: { totalLikes: -1 } },
+        { new: true },
+      );
     }
     return comment.likes;
   }
@@ -80,6 +97,14 @@ export class CommentsService {
     if (!comment) {
       throw new BadRequestException('Comment not found');
     }
+
+    if (comment.author) {
+      await this.UserModel.findByIdAndUpdate(
+        comment.author,
+        { $inc: { totalDislikes: 1 } },
+        { new: true },
+      );
+    }
     return comment.dislikes;
   }
 
@@ -92,23 +117,36 @@ export class CommentsService {
     if (!comment) {
       throw new BadRequestException('Comment not found');
     }
+    if (comment.author) {
+      await this.UserModel.findByIdAndUpdate(
+        comment.author,
+        { $inc: { totalDislikes: -1 } },
+        { new: true },
+      );
+    }
     return comment.dislikes;
   }
 
   async approveComment(commentId: string): Promise<string> {
-    const comment = await this.CommentModel.findByIdAndUpdate(
-      commentId,
-      { $set: { status: CommentStatus.APPROVED } },
-      { new: true },
-    );
+    const comment = await this.CommentModel.findById(commentId);
     if (!comment) {
       throw new BadRequestException('Comment not found');
     }
+    if (comment.status == CommentStatus.APPROVED) {
+      throw new BadRequestException('This comment is already approved');
+    }
+    comment.status = CommentStatus.APPROVED;
+    await comment.save();
     this.answersService.handleQuestionStatus(
       comment.answer,
       CommentStatus.APPROVED,
     );
-    return comment.status;
+    await this.UserModel.findByIdAndUpdate(
+      comment.author,
+      { $inc: { totalApproved: 1 } },
+      { new: true },
+    );
+    return comment.status; //kima t7eb chnoua traja3 status wela lcomment lkol , ba3d 9arrer
   }
 
   async disapproveComment(commentId: string): Promise<Comment> {
@@ -129,6 +167,11 @@ export class CommentsService {
     this.answersService.handleQuestionStatus(
       comment.answer,
       CommentStatus.DISAPPROVED,
+    );
+    await this.UserModel.findByIdAndUpdate(
+      comment.author,
+      { $inc: { totalApproved: -1 } },
+      { new: true },
     );
     return comment;
   }

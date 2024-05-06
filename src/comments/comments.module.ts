@@ -6,9 +6,11 @@ import { Comment, CommentSchema } from './models/comments.models';
 import { AnswersModule } from 'src/answers/answers.module';
 import { AnswersService } from 'src/answers/answers.service';
 import { QuestionsModule } from 'src/questions/questions.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     AnswersModule,
     QuestionsModule,
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
