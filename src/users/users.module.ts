@@ -12,6 +12,9 @@ import { PolesModule } from 'src/poles/poles.module';
   ],
   providers: [UsersService],
   controllers: [UsersController],
-  exports: [UsersService],
+  exports: [
+    UsersService,
+    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+  ],
 })
 export class UsersModule {}

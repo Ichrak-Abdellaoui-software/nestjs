@@ -20,9 +20,17 @@ export class QuestionsController {
   add(@Body() body: CreateQuestionDto) {
     return this.service.add(body);
   }
-  @Get()
+  @Get() // par plus ancienne
   findAll() {
     return this.service.findAll();
+  }
+  @Get('/newest') // par plus récente
+  findAllByNewest() {
+    return this.service.findAllByNewest();
+  }
+  @Get('/by-view') // most seen
+  findAllByViews() {
+    return this.service.findAllByViews();
   }
   @Get('/:id')
   findOne(@Param('id') id: string) {

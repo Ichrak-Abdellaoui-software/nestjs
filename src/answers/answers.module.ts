@@ -4,9 +4,11 @@ import { AnswersService } from './answers.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Answer, AnswerSchema } from './models/answers.models';
 import { QuestionsModule } from 'src/questions/questions.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     QuestionsModule,
     MongooseModule.forFeature([{ name: Answer.name, schema: AnswerSchema }]),
   ],
