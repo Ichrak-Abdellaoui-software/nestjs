@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { MinLength } from 'class-validator';
 import { Document, Types } from 'mongoose';
+import { Answer } from 'src/answers/models/answers.models';
+import { Comment } from 'src/comments/models/comments.models';
 import { UserRoles } from 'src/enums/user-roles.enum';
 import { Question } from 'src/questions/models/questions.models';
 
@@ -38,6 +40,12 @@ export class User {
 
   @Prop([{ type: Types.ObjectId, ref: Question.name }])
   questions: Types.ObjectId[];
+
+  @Prop([{ type: Types.ObjectId, ref: Answer.name }])
+  answers: Types.ObjectId[];
+
+  @Prop([{ type: Types.ObjectId, ref: Comment.name }])
+  comments: Types.ObjectId[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

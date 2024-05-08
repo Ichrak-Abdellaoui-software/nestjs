@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
+import { NotificationType } from 'src/enums/notifications-type.enum';
 
 export type NotificationDocument = Notification & Document;
 
@@ -11,11 +12,17 @@ export class Notification {
   @Prop({ required: true })
   title: string;
 
+  @Prop({ required: true })
+  type: NotificationType;
+
   @Prop({ required: true, type: Types.ObjectId, ref: 'Question' })
   questionId: Types.ObjectId;
 
   @Prop({ required: true, type: Types.ObjectId, ref: 'User' })
-  userId: Types.ObjectId; // a qui on envoie la notif
+  userId: Types.ObjectId; // à qui on envoie la notif
+
+  @Prop({ required: false, type: Types.ObjectId })
+  targetId: Types.ObjectId; // ID de cible :comment/answer
 }
 
 export const NotificationSchema = SchemaFactory.createForClass(Notification);

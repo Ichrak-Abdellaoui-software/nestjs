@@ -24,6 +24,11 @@ export class CommentsService {
       { $push: { comments: comment._id } },
       { new: true },
     );
+    await this.UserModel.findByIdAndUpdate(
+      comment.author,
+      { $push: { comments: comment._id } },
+      { new: true },
+    );
 
     return comment;
   }
