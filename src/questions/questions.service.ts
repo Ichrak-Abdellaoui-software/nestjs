@@ -15,144 +15,51 @@ export class QuestionsService {
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
   async add(body: CreateQuestionDto) {
-    const question = await this.QuestionModel.create(body);
+    const techs = await this.TechModel.find({
+      _id: { $in: body.techs },
+    });
+    const techNames = techs.map((tech) => tech.name);
+
+    const author = await this.UserModel.find({
+      _id: { $in: body.author },
+    });
+    const authorName = author.map((user) => user.fullname);
+
+    const question = await this.QuestionModel.create({
+      ...body,
+      techs: techNames,
+      author: authorName,
+    });
     await Promise.all(
-      body.techs.map((techId) =>
+      techs.map((tech) =>
         this.TechModel.findByIdAndUpdate(
-          techId,
-          { $addToSet: { questions: question._id } }, // addtoset pour assurer que lquestion s ajoute pas plusieurs fois a la meme tech
+          tech._id,
+          { $addToSet: { questions: question._id } },
           { new: true },
         ),
-      ), // test with JSON not Form-Encode ( sinon problem f array )
+      ),
     );
+
     await this.UserModel.findByIdAndUpdate(
       body.author,
-      { $push: { questions: question._id } }, // peu importe les doublons
+      { $push: { questions: question._id } },
       { new: true },
     );
-    //console.log('elkatb', body.author);
+
     return question;
   }
 
   //sorted by plus récente
   async findAll() {
-    return await this.QuestionModel.aggregate([
-      {
-        $sort: { createdAt: -1 },
-      },
-      {
-        $addFields: {
-          converted_tech_ids: {
-            $map: {
-              input: '$techs',
-              as: 'techId',
-              in: { $toObjectId: '$$techId' },
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'techs',
-          localField: 'converted_tech_ids',
-          foreignField: '_id',
-          as: 'tech_details',
-        },
-      },
-      {
-        $project: {
-          title: 1,
-          description: 1,
-          author: 1,
-          media: 1,
-          status: 1,
-          views: 1,
-          answers: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          techs: '$tech_details.name',
-        },
-      },
-    ]).exec();
+    return await this.QuestionModel.find().sort({ createdAt: -1 }).exec();
   }
   //sorted by plus ancienne
   async findAllByOld() {
-    return await this.QuestionModel.aggregate([
-      {
-        $addFields: {
-          converted_tech_ids: {
-            $map: {
-              input: '$techs',
-              as: 'techId',
-              in: { $toObjectId: '$$techId' },
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'techs',
-          localField: 'converted_tech_ids',
-          foreignField: '_id',
-          as: 'tech_details',
-        },
-      },
-      {
-        $project: {
-          title: 1,
-          description: 1,
-          author: 1,
-          media: 1,
-          status: 1,
-          views: 1,
-          answers: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          techs: '$tech_details.name',
-        },
-      },
-    ]).exec();
+    return await this.QuestionModel.find();
   }
   //sorted by most seen
   async findAllByViews() {
-    return await this.QuestionModel.aggregate([
-      {
-        $sort: { views: -1 },
-      },
-      {
-        $addFields: {
-          converted_tech_ids: {
-            $map: {
-              input: '$techs',
-              as: 'techId',
-              in: { $toObjectId: '$$techId' },
-            },
-          },
-        },
-      },
-      {
-        $lookup: {
-          from: 'techs',
-          localField: 'converted_tech_ids',
-          foreignField: '_id',
-          as: 'tech_details',
-        },
-      },
-      {
-        $project: {
-          title: 1,
-          description: 1,
-          author: 1,
-          media: 1,
-          status: 1,
-          views: 1,
-          answers: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          techs: '$tech_details.name',
-        },
-      },
-    ]).exec();
+    return await this.QuestionModel.find().sort({ views: -1 }).exec();
   }
   // get questions par une date
   async findQuestionsByDate(date: Date): Promise<Question[]> {
