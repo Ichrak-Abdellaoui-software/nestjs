@@ -34,17 +34,134 @@ export class QuestionsService {
     return question;
   }
 
-  //sorted by plus ancienne
-  findAll() {
-    return this.QuestionModel.find();
-  }
   //sorted by plus récente
-  findAllByNewest() {
-    return this.QuestionModel.find().sort({ createdAt: -1 });
+  async findAll() {
+    return await this.QuestionModel.aggregate([
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $addFields: {
+          converted_tech_ids: {
+            $map: {
+              input: '$techs',
+              as: 'techId',
+              in: { $toObjectId: '$$techId' },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'techs',
+          localField: 'converted_tech_ids',
+          foreignField: '_id',
+          as: 'tech_details',
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          author: 1,
+          status: 1,
+          views: 1,
+          answers: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          techs: '$tech_details.name',
+        },
+      },
+    ]).exec();
+  }
+  //sorted by plus ancienne
+  async findAllByOld() {
+    return await this.QuestionModel.aggregate([
+      {
+        $addFields: {
+          converted_tech_ids: {
+            $map: {
+              input: '$techs',
+              as: 'techId',
+              in: { $toObjectId: '$$techId' },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'techs',
+          localField: 'converted_tech_ids',
+          foreignField: '_id',
+          as: 'tech_details',
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          author: 1,
+          status: 1,
+          views: 1,
+          answers: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          techs: '$tech_details.name',
+        },
+      },
+    ]).exec();
   }
   //sorted by most seen
-  findAllByViews() {
-    return this.QuestionModel.find().sort({ views: -1 });
+  async findAllByViews() {
+    return await this.QuestionModel.aggregate([
+      {
+        $sort: { views: -1 },
+      },
+      {
+        $addFields: {
+          converted_tech_ids: {
+            $map: {
+              input: '$techs',
+              as: 'techId',
+              in: { $toObjectId: '$$techId' },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'techs',
+          localField: 'converted_tech_ids',
+          foreignField: '_id',
+          as: 'tech_details',
+        },
+      },
+      {
+        $project: {
+          title: 1,
+          description: 1,
+          author: 1,
+          status: 1,
+          views: 1,
+          answers: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          techs: '$tech_details.name',
+        },
+      },
+    ]).exec();
+  }
+  // get questions par une date
+  async findQuestionsByDate(date: Date): Promise<Question[]> {
+    const startDate = new Date(date);
+    startDate.setUTCHours(0, 0, 0, 0);
+
+    const endDate = new Date(date);
+    endDate.setUTCHours(23, 59, 59, 999);
+
+    return this.QuestionModel.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+    });
   }
 
   findOne(id: string) {

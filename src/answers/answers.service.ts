@@ -24,6 +24,11 @@ export class AnswersService {
       { $push: { answers: answer._id } },
       { new: true },
     );
+    await this.UserModel.findByIdAndUpdate(
+      answer.author,
+      { $push: { answers: answer._id } },
+      { new: true },
+    );
 
     return answer;
   }

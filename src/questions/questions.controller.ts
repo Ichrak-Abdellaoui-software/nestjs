@@ -12,6 +12,7 @@ import {
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { Question } from './models/questions.models';
 
 @Controller('questions')
 export class QuestionsController {
@@ -20,17 +21,27 @@ export class QuestionsController {
   add(@Body() body: CreateQuestionDto) {
     return this.service.add(body);
   }
-  @Get() // par plus ancienne
+  @Get() // par plus récente
   findAll() {
     return this.service.findAll();
   }
-  @Get('/newest') // par plus récente
+  @Get('/old') // par plus ancienne
   findAllByNewest() {
-    return this.service.findAllByNewest();
+    return this.service.findAllByOld();
   }
-  @Get('/by-view') // most seen
+  @Get('/mostseen') // most seen
   findAllByViews() {
     return this.service.findAllByViews();
+  }
+  @Get('/date/:date') // date/2024-05-10   "YYYY-MM-DD"
+  async findQuestionsByDate(@Param('date') date: string): Promise<Question[]> {
+    const formattedDate = new Date(date);
+    const questions = await this.service.findQuestionsByDate(formattedDate);
+
+    if (questions.length === 0) {
+      throw new NotFoundException('No questions found for this date!');
+    }
+    return questions;
   }
   @Get('/:id')
   findOne(@Param('id') id: string) {

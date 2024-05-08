@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProfileModule } from './profile/profile.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SavesModule } from './saves/saves.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     TechsModule,
     ProfileModule,
     NotificationsModule,
+    SavesModule,
   ],
 })
 export class AppModule {}

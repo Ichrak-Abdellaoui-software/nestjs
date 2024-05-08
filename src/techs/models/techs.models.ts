@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 //import { Question } from 'src/questions/models/questions.models';
 export type TechDocument = Tech & Document;
-@Schema()
+@Schema({ collection: 'techs' })
 export class Tech {
   @Prop({ required: true, unique: true })
   name: string;
