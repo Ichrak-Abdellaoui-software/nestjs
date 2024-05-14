@@ -15,47 +15,41 @@ export class QuestionsService {
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
   async add(body: CreateQuestionDto) {
-    const techs = await this.TechModel.find({
-      _id: { $in: body.techs },
-    });
-    const techNames = techs.map((tech) => tech.name);
-
-    const author = await this.UserModel.find({
-      _id: { $in: body.author },
-    });
-    const authorName = author.map((user) => user.fullname);
-
-    const question = await this.QuestionModel.create({
-      ...body,
-      techs: techNames,
-      author: authorName,
-    });
+    const question = await this.QuestionModel.create(body);
     await Promise.all(
-      techs.map((tech) =>
+      body.techs.map((techId) =>
         this.TechModel.findByIdAndUpdate(
-          tech._id,
-          { $addToSet: { questions: question._id } },
+          techId,
+          { $addToSet: { questions: question._id } }, // addtoset pour assurer que lquestion s ajoute pas plusieurs fois a la meme tech
           { new: true },
         ),
-      ),
+      ), // test with JSON not Form-Encode ( sinon problem f array )
     );
-
     await this.UserModel.findByIdAndUpdate(
       body.author,
-      { $push: { questions: question._id } },
+      { $push: { questions: question._id } }, // peu importe les doublons
       { new: true },
     );
-
+    //console.log('author', body.author);
     return question;
   }
 
   //sorted by plus récente
   async findAll() {
-    return await this.QuestionModel.find().sort({ createdAt: -1 }).exec();
+    return await this.QuestionModel.find()
+      .sort({ createdAt: -1 })
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
   }
   //sorted by plus ancienne
-  async findAllByOld() {
-    return await this.QuestionModel.find();
+  findAllByOld() {
+    return this.QuestionModel.find()
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
   }
   //sorted by most seen
   async findAllByViews() {
@@ -71,12 +65,21 @@ export class QuestionsService {
 
     return this.QuestionModel.find({
       createdAt: { $gte: startDate, $lte: endDate },
-    });
+    })
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
   }
 
-  findOne(id: string) {
-    //return this.QuestionModel.findOne({ _id: id });
-    return this.QuestionModel.findById(id);
+  async findOne(id: string) {
+    await this.incrementViews(id);
+    const question = await this.QuestionModel.findById(id)
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
+    return question;
   }
   delete(id: string) {
     return this.QuestionModel.findByIdAndDelete({ _id: id });
@@ -86,7 +89,11 @@ export class QuestionsService {
       { _id: id },
       { $set: body },
       { new: true },
-    );
+    )
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
   }
   search(key: string) {
     const keyword = key
@@ -97,7 +104,11 @@ export class QuestionsService {
           ],
         }
       : {};
-    return this.QuestionModel.find(keyword);
+    return this.QuestionModel.find(keyword)
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
   }
   async incrementViews(id: string): Promise<number> {
     //Promise<Question>

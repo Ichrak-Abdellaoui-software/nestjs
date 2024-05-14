@@ -33,11 +33,19 @@ export class CommentsService {
     return comment;
   }
   findAll() {
-    return this.CommentModel.find();
+    return this.CommentModel.find()
+      .populate('author')
+      .populate({ path: 'answer', model: 'Answer' })
+
+      .exec();
   }
   findOne(id: string) {
     //return this.CommentModel.findOne({ _id: id });
-    return this.CommentModel.findById(id);
+    return this.CommentModel.findById(id)
+      .populate('author')
+      .populate({ path: 'answer', model: 'Answer' })
+
+      .exec();
   }
   delete(id: string) {
     return this.CommentModel.findByIdAndDelete(id);
@@ -47,11 +55,19 @@ export class CommentsService {
       { _id: id },
       { $set: body },
       { new: true },
-    );
+    )
+      .populate('author')
+      .populate({ path: 'answer', model: 'Answer' })
+
+      .exec();
   }
   search(key: string) {
     const keyword = key ? { content: { $regex: key, $options: 'i' } } : {};
-    return this.CommentModel.find(keyword);
+    return this.CommentModel.find(keyword)
+      .populate('author')
+      .populate({ path: 'answer', model: 'Answer' })
+
+      .exec();
   }
 
   async like(commentId: string): Promise<number> {
