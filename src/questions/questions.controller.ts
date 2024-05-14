@@ -59,17 +59,4 @@ export class QuestionsController {
   search(@Query('key') key) {
     return this.service.search(key);
   }
-
-  @Get('/:id/views')
-  async incrementViews(@Param('id') id: string) {
-    try {
-      const updatedQuestion = await this.service.incrementViews(id);
-      return updatedQuestion;
-    } catch (error) {
-      if (error instanceof NotFoundException) {
-        throw new NotFoundException(error.message);
-      }
-      throw new Error('Failed to increment views due to an unexpected error');
-    }
-  }
 }

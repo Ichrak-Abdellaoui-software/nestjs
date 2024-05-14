@@ -5,9 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Tech, TechSchema } from './models/techs.models';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Tech.name, schema: TechSchema }]),
-  ],
+  imports: [MongooseModule.forFeature([{ name: 'Tech', schema: TechSchema }])],
   providers: [TechsService],
   controllers: [TechsController],
   exports: [

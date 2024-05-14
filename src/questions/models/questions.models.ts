@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { Answer } from 'src/answers/models/answers.models';
 import { QuestionStatus } from 'src/enums/question-status.enum';
-import { Tech } from 'src/techs/models/techs.models';
 
 export type QuestionDocument = Question & Document;
 
@@ -17,7 +16,7 @@ export class Question {
   @Prop({ required: true })
   description: string;
 
-  @Prop([{ type: Types.ObjectId, ref: Tech.name, required: true }])
+  @Prop([{ type: Types.ObjectId, ref: 'Tech', required: true }])
   techs: Types.ObjectId[];
 
   @Prop(

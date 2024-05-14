@@ -33,11 +33,19 @@ export class AnswersService {
     return answer;
   }
   findAll() {
-    return this.AnswerModel.find();
+    return this.AnswerModel.find()
+      .populate('author')
+      .populate({ path: 'question', model: 'Question' })
+      .populate({ path: 'comments', model: 'Comment' })
+      .exec();
   }
   findOne(id: string) {
     //return this.AnswerModel.findOne({ _id: id });
-    return this.AnswerModel.findById(id);
+    return this.AnswerModel.findById(id)
+      .populate('author')
+      .populate({ path: 'question', model: 'Question' })
+      .populate({ path: 'comments', model: 'Comment' })
+      .exec();
   }
   delete(id: string) {
     return this.AnswerModel.findByIdAndDelete({ _id: id });
@@ -47,11 +55,19 @@ export class AnswersService {
       { _id: id },
       { $set: body },
       { new: true },
-    );
+    )
+      .populate('author')
+      .populate({ path: 'question', model: 'Question' })
+      .populate({ path: 'comments', model: 'Comment' })
+      .exec();
   }
   search(key: string) {
     const keyword = key ? { content: { $regex: key, $options: 'i' } } : {};
-    return this.AnswerModel.find(keyword);
+    return this.AnswerModel.find(keyword)
+      .populate('author')
+      .populate({ path: 'question', model: 'Question' })
+      .populate({ path: 'comments', model: 'Comment' })
+      .exec();
   }
   async like(answerId: string): Promise<number> {
     const answer = await this.AnswerModel.findByIdAndUpdate(
