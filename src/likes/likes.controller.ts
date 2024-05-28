@@ -16,7 +16,7 @@ export class LikesController {
 
   @Post()
   async addLike(@Body() likeDto: LikeDto) {
-    return this.likesService.addLike(likeDto);
+    return this.likesService.add(likeDto);
   }
 
   @Get()
@@ -26,7 +26,11 @@ export class LikesController {
 
   @Get('user/:userId')
   async findByUser(@Param('userId') userId: string) {
-    return this.likesService.findByUser(userId);
+    return await this.likesService.findByUser(userId);
+  }
+  @Get('user/:userId/count')
+  async numberlikesByUser(@Param('userId') userId: string) {
+    return (await this.likesService.findByUser(userId)).length;
   }
 
   @Get('content/:contentId')

@@ -1,14 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Answer } from './models/answers.models';
 import { Model, Types } from 'mongoose';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
-import { Question } from 'src/questions/models/questions.models';
-import { AnswerStatus } from 'src/enums/answer-status.enum';
-import { QuestionStatus } from 'src/enums/question-status.enum';
-import { CommentStatus } from 'src/enums/comment-status.enum';
-import { User } from 'src/users/models/users.models';
+import { Question } from '../questions/models/questions.models';
+import { AnswerStatus } from '../enums/answer-status.enum';
+import { QuestionStatus } from '../enums/question-status.enum';
+import { CommentStatus } from '../enums/comment-status.enum';
+import { User } from '../users/models/users.models';
 
 @Injectable()
 export class AnswersService {
@@ -69,154 +70,154 @@ export class AnswersService {
       .populate({ path: 'comments', model: 'Comment' })
       .exec();
   }
-  async like(answerId: string): Promise<number> {
-    const answer = await this.AnswerModel.findByIdAndUpdate(
-      answerId,
-      { $inc: { likes: 1 } },
-      { new: true },
-    );
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    //incremnte totallikes
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalLikes: 1 } },
-        { new: true },
-      );
-    }
-    return answer.likes;
-  }
+  // async like(answerId: string): Promise<number> {
+  //   const answer = await this.AnswerModel.findByIdAndUpdate(
+  //     answerId,
+  //     { $inc: { likes: 1 } },
+  //     { new: true },
+  //   );
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   //incremnte totallikes
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalLikes: 1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   return answer.likes;
+  // }
 
-  async unlike(answerId: string): Promise<number> {
-    const answer = await this.AnswerModel.findByIdAndUpdate(
-      answerId,
-      { $inc: { likes: -1 } },
-      { new: true },
-    );
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalLikes: -1 } },
-        { new: true },
-      );
-    }
-    return answer.likes;
-  }
+  // async unlike(answerId: string): Promise<number> {
+  //   const answer = await this.AnswerModel.findByIdAndUpdate(
+  //     answerId,
+  //     { $inc: { likes: -1 } },
+  //     { new: true },
+  //   );
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalLikes: -1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   return answer.likes;
+  // }
 
-  async dislike(answerId: string): Promise<number> {
-    const answer = await this.AnswerModel.findByIdAndUpdate(
-      answerId,
-      { $inc: { dislikes: 1 } },
-      { new: true },
-    );
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalDislikes: 1 } },
-        { new: true },
-      );
-    }
-    return answer.dislikes;
-  }
+  // async dislike(answerId: string): Promise<number> {
+  //   const answer = await this.AnswerModel.findByIdAndUpdate(
+  //     answerId,
+  //     { $inc: { dislikes: 1 } },
+  //     { new: true },
+  //   );
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalDislikes: 1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   return answer.dislikes;
+  // }
 
-  async undislike(answerId: string): Promise<number> {
-    const answer = await this.AnswerModel.findByIdAndUpdate(
-      answerId,
-      { $inc: { dislikes: -1 } },
-      { new: true },
-    );
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalDislikes: -1 } },
-        { new: true },
-      );
-    }
-    return answer.dislikes;
-  }
+  // async undislike(answerId: string): Promise<number> {
+  //   const answer = await this.AnswerModel.findByIdAndUpdate(
+  //     answerId,
+  //     { $inc: { dislikes: -1 } },
+  //     { new: true },
+  //   );
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalDislikes: -1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   return answer.dislikes;
+  // }
 
-  async approveAnswer(answerId: string): Promise<Answer> {
-    const answer = await this.AnswerModel.findById(answerId);
+  // async approveAnswer(answerId: string): Promise<Answer> {
+  //   const answer = await this.AnswerModel.findById(answerId);
 
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    if (answer.status === AnswerStatus.APPROVED) {
-      throw new BadRequestException('This answer is already approved');
-    }
-    answer.status = AnswerStatus.APPROVED;
-    await answer.save();
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   if (answer.status === AnswerStatus.APPROVED) {
+  //     throw new BadRequestException('This answer is already approved');
+  //   }
+  //   answer.status = AnswerStatus.APPROVED;
+  //   await answer.save();
 
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalApproved: 1 } },
-        { new: true },
-      );
-    }
-    await this.QuestionModel.findByIdAndUpdate(
-      answer.question,
-      { $set: { status: QuestionStatus.CLOSED } },
-      { new: true },
-    );
-    return answer;
-  }
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalApproved: 1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   await this.QuestionModel.findByIdAndUpdate(
+  //     answer.question,
+  //     { $set: { status: QuestionStatus.CLOSED } },
+  //     { new: true },
+  //   );
+  //   return answer;
+  // }
 
-  async disapproveAnswer(answerId: string): Promise<Answer> {
-    const answer = await this.AnswerModel.findById(answerId);
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
-    if (answer.status !== AnswerStatus.APPROVED) {
-      throw new BadRequestException(
-        'Cannot disapprove an answer that is not approved',
-      );
-    }
-    answer.status = AnswerStatus.DISAPPROVED;
-    await answer.save();
-    if (answer.author) {
-      await this.UserModel.findByIdAndUpdate(
-        answer.author,
-        { $inc: { totalApproved: -1 } },
-        { new: true },
-      );
-    }
-    await this.QuestionModel.findByIdAndUpdate(
-      answer.question,
-      { $set: { status: QuestionStatus.OPEN } },
-      { new: true },
-    );
-    return answer;
-  }
-  async handleQuestionStatus(
-    answerId: Types.ObjectId,
-    status: CommentStatus,
-  ): Promise<void> {
-    const answer = await this.AnswerModel.findById(answerId).select('question');
-    if (!answer) {
-      throw new BadRequestException('Answer not found');
-    }
+  // async disapproveAnswer(answerId: string): Promise<Answer> {
+  //   const answer = await this.AnswerModel.findById(answerId);
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
+  //   if (answer.status !== AnswerStatus.APPROVED) {
+  //     throw new BadRequestException(
+  //       'Cannot disapprove an answer that is not approved',
+  //     );
+  //   }
+  //   answer.status = AnswerStatus.DISAPPROVED;
+  //   await answer.save();
+  //   if (answer.author) {
+  //     await this.UserModel.findByIdAndUpdate(
+  //       answer.author,
+  //       { $inc: { totalApproved: -1 } },
+  //       { new: true },
+  //     );
+  //   }
+  //   await this.QuestionModel.findByIdAndUpdate(
+  //     answer.question,
+  //     { $set: { status: QuestionStatus.OPEN } },
+  //     { new: true },
+  //   );
+  //   return answer;
+  // }
+  // async handleQuestionStatus(
+  //   answerId: Types.ObjectId,
+  //   status: CommentStatus,
+  // ): Promise<void> {
+  //   const answer = await this.AnswerModel.findById(answerId).select('question');
+  //   if (!answer) {
+  //     throw new BadRequestException('Answer not found');
+  //   }
 
-    const newQuestionStatus =
-      status === CommentStatus.APPROVED
-        ? QuestionStatus.CLOSED
-        : QuestionStatus.OPEN;
+  //   const newQuestionStatus =
+  //     status === CommentStatus.APPROVED
+  //       ? QuestionStatus.CLOSED
+  //       : QuestionStatus.OPEN;
 
-    await this.QuestionModel.findByIdAndUpdate(
-      answer.question,
-      { $set: { status: newQuestionStatus } },
-      { new: true },
-    );
-  }
+  //   await this.QuestionModel.findByIdAndUpdate(
+  //     answer.question,
+  //     { $set: { status: newQuestionStatus } },
+  //     { new: true },
+  //   );
+  // }
 }

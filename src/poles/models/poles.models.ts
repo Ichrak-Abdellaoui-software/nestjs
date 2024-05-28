@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { User } from 'src/users/models/users.models';
+import { User } from '../../users/models/users.models';
 export type PoleDocument = Pole & Document;
 @Schema()
 export class Pole {

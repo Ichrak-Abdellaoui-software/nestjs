@@ -9,8 +9,8 @@ import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
-import { Pole } from 'src/poles/models/poles.models';
-import { Question } from 'src/questions/models/questions.models';
+import { Pole } from '../poles/models/poles.models';
+import { Question } from '../questions/models/questions.models';
 
 @Injectable()
 export class UsersService {

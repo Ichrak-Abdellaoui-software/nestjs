@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { User } from 'src/users/models/users.models';
+import { User } from '../../users/models/users.models';
 
 export type DislikeDocument = Dislike & Document;
 
@@ -9,11 +9,11 @@ export class Dislike {
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   createdBy: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, required: true, refPath: 'contentType' })
-  targetId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'Answer', required: false })
+  answerId: Types.ObjectId;
 
-  @Prop({ type: String, required: true, enum: ['Answer', 'Comment'] })
-  contentType: string;
+  @Prop({ type: Types.ObjectId, ref: 'Comment', required: false })
+  commentId: Types.ObjectId;
 }
 
 export const DislikeSchema = SchemaFactory.createForClass(Dislike);

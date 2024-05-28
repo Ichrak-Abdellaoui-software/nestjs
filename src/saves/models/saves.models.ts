@@ -6,10 +6,10 @@ export type SaveDocument = Save & Document;
 @Schema({ timestamps: true })
 export class Save {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-  user: Types.ObjectId;
+  userId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Question', required: true })
-  question: Types.ObjectId;
+  questionId: Types.ObjectId[];
 }
 
 export const SaveSchema = SchemaFactory.createForClass(Save);

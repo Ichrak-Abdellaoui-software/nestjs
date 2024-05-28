@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsOptional, IsMongoId } from 'class-validator';
 import { Types } from 'mongoose';
-import { CommentStatus } from 'src/enums/comment-status.enum';
+import { CommentStatus } from '../../enums/comment-status.enum';
 
 export class CreateCommentDto {
   @IsMongoId()
