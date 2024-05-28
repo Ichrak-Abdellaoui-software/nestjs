@@ -1,44 +1,25 @@
-import {
-  Controller,
-  Post,
-  Delete,
-  Get,
-  Param,
-  Body,
-  HttpCode,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Delete, Get, Param, Body } from '@nestjs/common';
 import { SavesService } from './saves.service';
-import { Types } from 'mongoose';
+import { SaveDto } from './dto/saves.dto';
 
 @Controller('saves')
 export class SavesController {
   constructor(private readonly service: SavesService) {}
 
   @Post()
-  async add(
-    @Body('userId') userId: string,
-    @Body('questionId') questionId: string,
-  ) {
-    const userIdObj = new Types.ObjectId(userId);
-    const questionIdObj = new Types.ObjectId(questionId);
-    return this.service.add(userIdObj, questionIdObj);
+  add(@Body() body: SaveDto) {
+    return this.service.add(body);
   }
-
-  @Delete()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async delete(
-    @Body('userId') userId: string,
-    @Body('questionId') questionId: string,
+  @Delete('/:userId/:questionId')
+  delete(
+    @Param('userId') userid: string,
+    @Param('questionId') questionid: string,
   ) {
-    const userIdObj = new Types.ObjectId(userId);
-    const questionIdObj = new Types.ObjectId(questionId);
-    await this.service.delete(userIdObj, questionIdObj);
+    return this.service.delete(userid, questionid);
   }
 
   @Get('/:userId')
   getUserSaves(@Param('userId') userId: string) {
-    const userIdObj = new Types.ObjectId(userId);
-    return this.service.findUserSaves(userIdObj);
+    return this.service.findUserSaves(userId);
   }
 }

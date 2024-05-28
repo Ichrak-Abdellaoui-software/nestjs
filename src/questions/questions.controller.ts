@@ -8,18 +8,23 @@ import {
   Post,
   Put,
   Query,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Question } from './models/questions.models';
+import { JwtGuard } from '../auth/guards/jwt.guard';
 
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
   @Post()
-  add(@Body() body: CreateQuestionDto) {
-    return this.service.add(body);
+  @UseGuards(JwtGuard)
+  async add(@Body() body: CreateQuestionDto, @Req() req: any) {
+    const userId = req.user.userId;
+    return this.service.add(body, userId);
   }
   @Get() // par plus récente
   findAll() {

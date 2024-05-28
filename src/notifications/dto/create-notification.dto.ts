@@ -6,7 +6,7 @@ import {
   IsOptional,
 } from 'class-validator';
 //import { Types } from 'mongoose';
-import { NotificationType } from 'src/enums/notifications-type.enum';
+import { NotificationType } from '../../enums/notifications-type.enum';
 
 export class CreateNotificationDto {
   @IsMongoId()

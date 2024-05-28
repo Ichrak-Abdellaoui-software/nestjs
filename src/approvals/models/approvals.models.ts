@@ -1,13 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { User } from '../../users/models/users.models';
 
-export type LikeDocument = Like & Document;
+export type ApprovalDocument = Approval & Document;
 
 @Schema({ timestamps: true })
-export class Like {
-  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
-  createdBy: Types.ObjectId;
+export class Approval {
+  @Prop({ type: Types.ObjectId, ref: 'Question', required: true })
+  questionId: Types.ObjectId;
 
   @Prop({ type: Types.ObjectId, ref: 'Answer', required: false })
   answerId: Types.ObjectId;
@@ -16,4 +15,4 @@ export class Like {
   commentId: Types.ObjectId;
 }
 
-export const LikeSchema = SchemaFactory.createForClass(Like);
+export const ApprovalSchema = SchemaFactory.createForClass(Approval);

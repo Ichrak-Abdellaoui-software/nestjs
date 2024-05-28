@@ -1,7 +1,8 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { Answer } from 'src/answers/models/answers.models';
-import { QuestionStatus } from 'src/enums/question-status.enum';
+import { Answer } from '../../answers/models/answers.models';
+
+import { QuestionStatus } from '../../enums/question-status.enum';
 
 export type QuestionDocument = Question & Document;
 

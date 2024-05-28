@@ -7,7 +7,7 @@ import { LikeDto } from './dto/like.dto';
 @Injectable()
 export class LikesService {
   constructor(@InjectModel(Like.name) private likeModel: Model<Like>) {}
-  async addLike(likeDto: LikeDto): Promise<Like> {
+  async add(likeDto: LikeDto): Promise<Like> {
     const newLike = new this.likeModel(likeDto);
     return newLike.save();
   }
@@ -17,7 +17,12 @@ export class LikesService {
   }
 
   async findByUser(userId: string): Promise<Like[]> {
-    return this.likeModel.find({ createdBy: userId }).exec();
+    return this.likeModel
+      .find({ createdBy: userId })
+      .find({ createdBy: userId })
+      .populate({ path: 'answerId', model: 'Answer' })
+      .populate({ path: 'commentId', model: 'Comment' })
+      .exec();
   }
 
   async findForContent(contentId: string): Promise<Like[]> {

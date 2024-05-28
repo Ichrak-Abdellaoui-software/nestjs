@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Notification } from './models/notifications.models';
-import { NotificationType } from 'src/enums/notifications-type.enum';
-import { User } from 'src/users/models/users.models';
+import { NotificationType } from '../enums/notifications-type.enum';
+import { User } from '../users/models/users.models';
 @Injectable()
 export class NotificationsService {
   constructor(

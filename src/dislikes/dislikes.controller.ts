@@ -1,48 +1,52 @@
 import {
-  Body,
   Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
   Post,
+  Get,
+  Param,
+  Delete,
+  Body,
+  NotFoundException,
 } from '@nestjs/common';
-import { DislikeDto } from './dto/dislike.dto';
 import { DislikesService } from './dislikes.service';
+import { DislikeDto } from './dto/dislike.dto';
 
-@Controller('dislikes')
+@Controller('likes')
 export class DislikesController {
-  constructor(private readonly likesService: DislikesService) {}
+  constructor(private readonly dislikesService: DislikesService) {}
 
   @Post()
-  async addDislike(@Body() likeDto: DislikeDto) {
-    return this.likesService.addDislike(likeDto);
+  async addDislike(@Body() dislikeDto: DislikeDto) {
+    return this.dislikesService.add(dislikeDto);
   }
 
   @Get()
   async findAll() {
-    return this.likesService.findAll();
+    return this.dislikesService.findAll();
   }
 
   @Get('user/:userId')
   async findByUser(@Param('userId') userId: string) {
-    return this.likesService.findByUser(userId);
+    return await this.dislikesService.findByUser(userId);
+  }
+  @Get('user/:userId/count')
+  async numberlikesByUser(@Param('userId') userId: string) {
+    return (await this.dislikesService.findByUser(userId)).length;
   }
 
   @Get('content/:contentId')
   async findForContent(@Param('contentId') contentId: string) {
-    return this.likesService.findForContent(contentId);
+    return this.dislikesService.findForContent(contentId);
   }
 
   @Get('content/:contentId/count')
   async numberDislikesForContent(@Param('contentId') contentId: string) {
-    return this.likesService.numberDislikesForContent(contentId);
+    return this.dislikesService.numberDislikesForContent(contentId);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
     try {
-      await this.likesService.remove(id);
+      await this.dislikesService.remove(id);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new NotFoundException('Dislike not found');

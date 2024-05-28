@@ -3,10 +3,10 @@ import { CommentsService } from './comments.service';
 import { CommentsController } from './comments.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Comment, CommentSchema } from './models/comments.models';
-import { AnswersModule } from 'src/answers/answers.module';
-import { AnswersService } from 'src/answers/answers.service';
-import { QuestionsModule } from 'src/questions/questions.module';
-import { UsersModule } from 'src/users/users.module';
+import { AnswersModule } from '../answers/answers.module';
+import { AnswersService } from '../answers/answers.service';
+import { QuestionsModule } from '../questions/questions.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -17,6 +17,9 @@ import { UsersModule } from 'src/users/users.module';
   ],
   providers: [CommentsService, AnswersService],
   controllers: [CommentsController],
-  exports: [CommentsService],
+  exports: [
+    CommentsService,
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+  ],
 })
 export class CommentsModule {}

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { AnswerStatus } from 'src/enums/answer-status.enum';
+import { AnswerStatus } from '../../enums/answer-status.enum';
 
 export type AnswerDocument = Answer & Document;
 @Schema({ timestamps: true })
@@ -31,12 +31,6 @@ export class Answer {
 
   @Prop([{ type: Types.ObjectId, ref: 'Comment' }])
   comments: Types.ObjectId[];
-
-  @Prop({ type: Number, default: 0 })
-  likes: number;
-
-  @Prop({ type: Number, default: 0 })
-  dislikes: number;
 
   @Prop({ enum: AnswerStatus, default: AnswerStatus.PENDING })
   status: AnswerStatus;

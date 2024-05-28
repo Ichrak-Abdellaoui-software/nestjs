@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Question } from './models/questions.models';
 import { Model } from 'mongoose';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { Tech } from 'src/techs/models/techs.models';
-import { User } from 'src/users/models/users.models';
+import { Tech } from '../techs/models/techs.models';
+import { User } from '../users/models/users.models';
 
 @Injectable()
 export class QuestionsService {
@@ -14,23 +14,26 @@ export class QuestionsService {
     @InjectModel(Tech.name) private TechModel: Model<Tech>,
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
-  async add(body: CreateQuestionDto) {
-    const question = await this.QuestionModel.create(body);
+  async add(body: CreateQuestionDto, userId: string) {
+    const newQuestionData = {
+      ...body,
+      author: userId,
+    };
+    const question = await this.QuestionModel.create(newQuestionData);
     await Promise.all(
       body.techs.map((techId) =>
         this.TechModel.findByIdAndUpdate(
           techId,
-          { $addToSet: { questions: question._id } }, // addtoset pour assurer que lquestion s ajoute pas plusieurs fois a la meme tech
+          { $addToSet: { questions: question._id } }, // addtoset pour assurer que la question ne s'ajoute pas plusieurs fois à la même tech
           { new: true },
         ),
       ), // test with JSON not Form-Encode ( sinon problem f array )
     );
     await this.UserModel.findByIdAndUpdate(
-      body.author,
+      userId,
       { $push: { questions: question._id } }, // peu importe les doublons
       { new: true },
     );
-    //console.log('author', body.author);
     return question;
   }
 
@@ -117,6 +120,9 @@ export class QuestionsService {
       { $inc: { views: 1 } },
       { new: true, runValidators: true },
     );
+    if (!question) {
+      throw new NotFoundException(`Question with id ${id} not found`);
+    }
 
     // return question;
     return question.views;

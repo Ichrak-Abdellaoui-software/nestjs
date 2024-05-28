@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   Param,
-  Patch,
   Post,
   Put,
   Query,
@@ -41,39 +40,39 @@ export class AnswersController {
     return this.service.search(key);
   }
 
-  @Patch('/:id/like')
-  async like(@Param('id') id: string) {
-    const likes = await this.service.like(id);
-    return { likes };
-  }
+  // @Patch('/:id/like')
+  // async like(@Param('id') id: string) {
+  //   const likes = await this.service.like(id);
+  //   return { likes };
+  // }
 
-  @Patch('/:id/unlike')
-  async unlike(@Param('id') id: string) {
-    const likes = await this.service.unlike(id);
-    return { likes };
-  }
+  // @Patch('/:id/unlike')
+  // async unlike(@Param('id') id: string) {
+  //   const likes = await this.service.unlike(id);
+  //   return { likes };
+  // }
 
-  @Patch('/:id/dislike')
-  async dislike(@Param('id') id: string) {
-    const dislikes = await this.service.dislike(id);
-    return { dislikes };
-  }
+  // @Patch('/:id/dislike')
+  // async dislike(@Param('id') id: string) {
+  //   const dislikes = await this.service.dislike(id);
+  //   return { dislikes };
+  // }
 
-  @Patch('/:id/undislike')
-  async undislike(@Param('id') id: string) {
-    const dislikes = await this.service.undislike(id);
-    return { dislikes };
-  }
+  // @Patch('/:id/undislike')
+  // async undislike(@Param('id') id: string) {
+  //   const dislikes = await this.service.undislike(id);
+  //   return { dislikes };
+  // }
 
-  @Patch('/:id/approve')
-  async approve(@Param('id') id: string) {
-    const answer = await this.service.approveAnswer(id);
-    return answer;
-  }
+  // @Patch('/:id/approve')
+  // async approve(@Param('id') id: string) {
+  //   const answer = await this.service.approveAnswer(id);
+  //   return answer;
+  // }
 
-  @Patch('/:id/disapprove')
-  async disapprove(@Param('id') id: string) {
-    const answer = await this.service.disapproveAnswer(id);
-    return answer;
-  }
+  // @Patch('/:id/disapprove')
+  // async disapprove(@Param('id') id: string) {
+  //   const answer = await this.service.disapproveAnswer(id);
+  //   return answer;
+  // }
 }

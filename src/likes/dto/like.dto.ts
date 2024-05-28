@@ -1,5 +1,4 @@
-import { IsNotEmpty, IsEnum, IsMongoId } from 'class-validator';
-import { LikableTypes } from 'src/enums/likable-types.enum';
+import { IsNotEmpty, IsMongoId, IsOptional } from 'class-validator';
 
 export class LikeDto {
   @IsMongoId()
@@ -7,10 +6,10 @@ export class LikeDto {
   createdBy: string;
 
   @IsMongoId()
-  @IsNotEmpty()
-  targetId: string;
+  @IsOptional()
+  answerId?: string;
 
-  @IsEnum(LikableTypes)
-  @IsNotEmpty()
-  contentType: LikableTypes;
+  @IsMongoId()
+  @IsOptional()
+  commentId?: string;
 }

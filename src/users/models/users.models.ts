@@ -1,10 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { MinLength } from 'class-validator';
 import { Document, Types } from 'mongoose';
-import { Answer } from 'src/answers/models/answers.models';
-import { Comment } from 'src/comments/models/comments.models';
-import { UserRoles } from 'src/enums/user-roles.enum';
-import { Question } from 'src/questions/models/questions.models';
+import { Answer } from '../../answers/models/answers.models';
+import { Comment } from '../../comments/models/comments.models';
+import { UserRoles } from '../../enums/user-roles.enum';
+import { Question } from '../../questions/models/questions.models';
 
 export type UserDocument = User & Document;
 
@@ -29,14 +29,8 @@ export class User {
   @Prop()
   avatar: string;
 
-  @Prop({ type: Number, default: 0 })
-  totalLikes: number;
-
-  @Prop({ type: Number, default: 0 })
-  totalDislikes: number;
-
-  @Prop({ type: Number, default: 0 })
-  totalApproved: number;
+  // @Prop({ type: Number, default: 0 })
+  // totalApproved: number;
 
   @Prop([{ type: Types.ObjectId, ref: Question.name }])
   questions: Types.ObjectId[];

@@ -3,8 +3,8 @@ import { AnswersController } from './answers.controller';
 import { AnswersService } from './answers.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Answer, AnswerSchema } from './models/answers.models';
-import { QuestionsModule } from 'src/questions/questions.module';
-import { UsersModule } from 'src/users/users.module';
+import { QuestionsModule } from '../questions/questions.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [

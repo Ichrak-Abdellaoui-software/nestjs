@@ -1,24 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Save } from './models/saves.models';
 import { InjectModel } from '@nestjs/mongoose';
+import { SaveDto } from './dto/saves.dto';
 
 @Injectable()
 export class SavesService {
   constructor(@InjectModel(Save.name) private SaveModel: Model<Save>) {}
 
-  async add(userId: Types.ObjectId, questionId: Types.ObjectId): Promise<Save> {
-    const newSave = new this.SaveModel({ user: userId, question: questionId });
-    return newSave.save();
+  async add(body: SaveDto) {
+    return await this.SaveModel.create(body);
   }
-
-  async delete(
-    userId: Types.ObjectId,
-    questionId: Types.ObjectId,
-  ): Promise<void> {
-    await this.SaveModel.deleteOne({ user: userId, question: questionId });
+  delete(userId: string, questionId: string) {
+    return this.SaveModel.deleteOne({ userId, questionId });
   }
-  async findUserSaves(userId: Types.ObjectId): Promise<Save[]> {
-    return this.SaveModel.find({ user: userId }).populate('question');
+  async findUserSaves(userId: string) {
+    return this.SaveModel.find({ userId }).populate('questionId');
   }
 }
