@@ -50,6 +50,11 @@ export class UsersController {
   update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.service.update(id, body);
   }
+  @Put('/:id/avatar')
+  updateAvatarUrl(@Param('id') id: string, @Body('avatar') avatarUrl: string) {
+    console.log(avatarUrl);
+    return this.service.updateAvatarUrl(id, avatarUrl);
+  }
   @Delete('/:id')
   delete(@Param('id') id: string) {
     return this.service.delete(id);
