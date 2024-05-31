@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/logint.dto';
-import { JwtGuard } from './guards/jwt.guard';
 import { Response, Request } from 'express';
 
 @Controller('auth')

@@ -8,7 +8,6 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
@@ -16,14 +15,25 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Question } from './models/questions.models';
 import { JwtGuard } from '../auth/guards/jwt.guard';
+import { User } from '../decorators/user.decorator';
 
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
-  @Post()
+
+  @Post('/add')
   @UseGuards(JwtGuard)
-  async add(@Body() body: CreateQuestionDto, @Req() req: any) {
-    const userId = req.user.userId;
+  async add(@Body() body: CreateQuestionDto, @User() user: any) {
+    const userId = user._id;
+    console.log(
+      'add post:: ',
+      body,
+      'userId',
+      userId,
+      'role',
+      user.role,
+      user.email,
+    );
     return this.service.add(body, userId);
   }
   @Get() // par plus récente

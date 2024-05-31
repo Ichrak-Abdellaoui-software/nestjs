@@ -7,10 +7,6 @@ export class CreateQuestionDto {
   title: string;
 
   @IsNotEmpty()
-  @IsMongoId()
-  author: Types.ObjectId;
-
-  @IsNotEmpty()
   @IsString()
   description: string;
 
