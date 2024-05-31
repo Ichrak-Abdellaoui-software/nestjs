@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -14,7 +15,6 @@ import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Question } from './models/questions.models';
-import { JwtGuard } from '../auth/guards/jwt.guard';
 import { User } from '../decorators/user.decorator';
 
 @Controller('questions')
@@ -22,7 +22,6 @@ export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
 
   @Post('/add')
-  @UseGuards(JwtGuard)
   async add(@Body() body: CreateQuestionDto, @User() user: any) {
     const userId = user._id;
     console.log(

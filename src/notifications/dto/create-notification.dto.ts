@@ -19,9 +19,6 @@ export class CreateNotificationDto {
   @IsMongoId()
   questionId: string;
 
-  @IsMongoId()
-  userId: string;
-
   @IsOptional()
   @IsMongoId()
   targetId?: string;

@@ -9,14 +9,16 @@ import {
 } from '@nestjs/common';
 import { DislikesService } from './dislikes.service';
 import { DislikeDto } from './dto/dislike.dto';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('likes')
 export class DislikesController {
   constructor(private readonly dislikesService: DislikesService) {}
 
   @Post()
-  async addDislike(@Body() dislikeDto: DislikeDto) {
-    return this.dislikesService.add(dislikeDto);
+  async addDislike(@Body() dislikeDto: DislikeDto, @User() user: any) {
+    const userId = user._id;
+    return this.dislikesService.add(dislikeDto, userId);
   }
 
   @Get()

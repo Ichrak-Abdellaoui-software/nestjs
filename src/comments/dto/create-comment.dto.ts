@@ -3,10 +3,6 @@ import { Types } from 'mongoose';
 import { CommentStatus } from '../../enums/comment-status.enum';
 
 export class CreateCommentDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  author: Types.ObjectId;
-
   @IsNotEmpty()
   content: string;
 

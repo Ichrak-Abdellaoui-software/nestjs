@@ -11,13 +11,15 @@ import {
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly service: CommentsService) {}
   @Post()
-  add(@Body() body: CreateCommentDto) {
-    return this.service.add(body);
+  add(@Body() body: CreateCommentDto, @User() user: any) {
+    const userId = user._id;
+    return this.service.add(body, userId);
   }
   @Get()
   findAll() {
