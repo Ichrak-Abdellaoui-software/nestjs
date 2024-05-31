@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
   Injectable,
@@ -11,6 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Pole } from '../poles/models/poles.models';
 import { Question } from '../questions/models/questions.models';
+import { createCanvas, registerFont } from 'canvas';
 
 @Injectable()
 export class UsersService {
@@ -19,13 +21,29 @@ export class UsersService {
     @InjectModel(Pole.name) private PoleModel: Model<Pole>,
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
   ) {}
+  async generateAvatar(initial: string): Promise<string> {
+    const canvas = createCanvas(100, 100);
+    const context = canvas.getContext('2d');
+
+    context.fillStyle = '#fff'; // Fond blanc
+    context.fillRect(0, 0, 100, 100);
+    context.fillStyle = '#000'; // Texte noir
+    context.font = '48px sans-serif';
+    context.textAlign = 'center';
+    context.fillText(initial.toUpperCase(), 50, 62);
+
+    return canvas.toDataURL();
+  }
   async add(body: CreateUserDto) {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
+      const initial = body.fullname.charAt(0); // Prendre la première lettre du nom
+      const avatarUrl = await this.generateAvatar(initial);
 
       const newUser = new this.UserModel({
         ...body,
         password: hashedPassword,
+        avatar: avatarUrl,
       });
 
       const createdUser = await newUser.save();
@@ -109,7 +127,7 @@ export class UsersService {
 
     return mostPosting;
   }
-
+  ////////////////////////////////////////////////////
   findOne(id: string) {
     //return this.UserModel.findOne({ _id: id });
     return this.UserModel.findById(id);
