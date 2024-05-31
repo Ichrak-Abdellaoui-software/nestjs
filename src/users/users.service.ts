@@ -25,9 +25,9 @@ export class UsersService {
     const canvas = createCanvas(100, 100);
     const context = canvas.getContext('2d');
 
-    context.fillStyle = '#fff'; // Fond blanc
+    context.fillStyle = '#D5ACD2';
     context.fillRect(0, 0, 100, 100);
-    context.fillStyle = '#000'; // Texte noir
+    context.fillStyle = '#4B0146';
     context.font = '48px sans-serif';
     context.textAlign = 'center';
     context.fillText(initial.toUpperCase(), 50, 62);
@@ -37,7 +37,7 @@ export class UsersService {
   async add(body: CreateUserDto) {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
-      const initial = body.fullname.charAt(0); // Prendre la première lettre du nom
+      const initial = body.fullname.charAt(0) + body.fullname.charAt(1);
       const avatarUrl = await this.generateAvatar(initial);
 
       const newUser = new this.UserModel({
@@ -148,6 +148,14 @@ export class UsersService {
       { new: true, runValidators: true },
     );
   }
+  async updateAvatarUrl(id: string, avatarUrl: string): Promise<User> {
+    return this.UserModel.findByIdAndUpdate(
+      id,
+      { avatar: avatarUrl },
+      { new: true },
+    );
+  }
+
   search(key: string) {
     const keyword = key ? { name: { $regex: key, $options: 'i' } } : {};
     return this.UserModel.find(keyword);
