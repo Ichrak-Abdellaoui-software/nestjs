@@ -18,15 +18,19 @@ export class CommentsService {
     @InjectModel(User.name) private UserModel: Model<User>,
     private answersService: AnswersService,
   ) {}
-  async add(body: CreateCommentDto): Promise<Comment> {
-    const comment = await this.CommentModel.create(body);
+  async add(body: CreateCommentDto, userId: string): Promise<Comment> {
+    const newCommentData = {
+      ...body,
+      author: userId,
+    };
+    const comment = await this.CommentModel.create(newCommentData);
     await this.AnswerModel.findByIdAndUpdate(
       comment.answer,
       { $push: { comments: comment._id } },
       { new: true },
     );
     await this.UserModel.findByIdAndUpdate(
-      comment.author,
+      userId,
       { $push: { comments: comment._id } },
       { new: true },
     );

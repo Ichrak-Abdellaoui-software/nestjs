@@ -8,12 +8,13 @@ import { PolesModule } from './poles/poles.module';
 import { TechsModule } from './techs/techs.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { ProfileModule } from './profile/profile.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SavesModule } from './saves/saves.module';
 import { LikesModule } from './likes/likes.module';
 import { DislikesModule } from './dislikes/dislikes.module';
 import { ApprovalsModule } from './approvals/approvals.module';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtGuard } from './auth/guards/jwt.guard';
 
 @Module({
   imports: [
@@ -26,12 +27,17 @@ import { ApprovalsModule } from './approvals/approvals.module';
     CommentsModule,
     PolesModule,
     TechsModule,
-    ProfileModule,
     NotificationsModule,
     SavesModule,
     LikesModule,
     DislikesModule,
     ApprovalsModule,
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
   ],
 })
 export class AppModule {}

@@ -4,6 +4,7 @@ import { Model, Types } from 'mongoose';
 import { Notification } from './models/notifications.models';
 import { NotificationType } from '../enums/notifications-type.enum';
 import { User } from '../users/models/users.models';
+import { CreateNotificationDto } from './dto/create-notification.dto';
 @Injectable()
 export class NotificationsService {
   constructor(
@@ -13,23 +14,30 @@ export class NotificationsService {
     private UserModel: Model<User>,
   ) {}
 
-  async createNotification(dto: any): Promise<Notification> {
-    // Récupérer les informations du créateur avant de créer la notification
-    const creator = await this.fetchUserById(dto.creatorId);
+  async createNotification(
+    dto: CreateNotificationDto,
+    userId: string,
+  ): Promise<Notification> {
+    const userObjectId = new Types.ObjectId(userId);
+    const targetObjectId = new Types.ObjectId(dto.targetId);
+    const creator = await this.fetchUserById(userObjectId);
+
     const message = this.formatNotificationMessage(
-      creator.fullname, // Utiliser le nom complet
+      creator.fullname,
       dto.type,
-      dto.targetId,
+      targetObjectId,
     );
-    dto.title = message; // Assigner le message formaté au titre de la notification
-    const newNotification = new this.NotificationModel(dto);
+    const newNotificationData = {
+      ...dto,
+      title: message,
+      creatorId: userObjectId,
+      targetId: targetObjectId,
+    };
+    const newNotification = new this.NotificationModel(newNotificationData);
     return newNotification.save();
   }
 
-  // Méthode pour récupérer les détails d'un utilisateur
   async fetchUserById(userId: Types.ObjectId): Promise<any> {
-    // Suppose que vous avez un modèle User accessible ici
-    // Cette méthode doit être adaptée selon votre structure
     return this.UserModel.findById(userId).exec();
   }
 

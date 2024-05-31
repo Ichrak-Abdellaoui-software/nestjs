@@ -18,15 +18,19 @@ export class AnswersService {
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
-  async add(body: CreateAnswerDto): Promise<Answer> {
-    const answer = await this.AnswerModel.create(body);
+  async add(body: CreateAnswerDto, userId: string): Promise<Answer> {
+    const newAnswerData = {
+      ...body,
+      author: userId,
+    };
+    const answer = await this.AnswerModel.create(newAnswerData);
     await this.QuestionModel.findByIdAndUpdate(
       answer.question,
       { $push: { answers: answer._id } },
       { new: true },
     );
     await this.UserModel.findByIdAndUpdate(
-      answer.author,
+      userId,
       { $push: { answers: answer._id } },
       { new: true },
     );

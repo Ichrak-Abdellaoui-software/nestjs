@@ -11,13 +11,15 @@ import {
 import { AnswersService } from './answers.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('answers')
 export class AnswersController {
   constructor(private readonly service: AnswersService) {}
   @Post()
-  add(@Body() body: CreateAnswerDto) {
-    return this.service.add(body);
+  async add(@Body() body: CreateAnswerDto, @User() user: any) {
+    const userId = user._id;
+    return this.service.add(body, userId);
   }
   @Get()
   findAll() {

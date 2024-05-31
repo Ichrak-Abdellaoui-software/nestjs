@@ -3,10 +3,6 @@ import { Types } from 'mongoose';
 import { AnswerStatus } from '../../enums/answer-status.enum';
 
 export class CreateAnswerDto {
-  @IsMongoId()
-  @IsNotEmpty()
-  author: Types.ObjectId;
-
   @IsNotEmpty()
   content: string;
 

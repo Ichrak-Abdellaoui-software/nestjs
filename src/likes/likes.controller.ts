@@ -9,14 +9,16 @@ import {
 } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { LikeDto } from './dto/like.dto';
+import { User } from 'src/decorators/user.decorator';
 
 @Controller('likes')
 export class LikesController {
   constructor(private readonly likesService: LikesService) {}
 
   @Post()
-  async addLike(@Body() likeDto: LikeDto) {
-    return this.likesService.add(likeDto);
+  async addLike(@Body() likeDto: LikeDto, @User() user: any) {
+    const userId = user._id;
+    return this.likesService.add(likeDto, userId);
   }
 
   @Get()
