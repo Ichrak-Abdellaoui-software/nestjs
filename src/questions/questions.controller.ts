@@ -57,6 +57,10 @@ export class QuestionsController {
     }
     return questions;
   }
+  @Get('/mine')
+  findByUser(@User() user: any) {
+    return this.service.findByUser(user._id);
+  }
   @Get('/:id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);

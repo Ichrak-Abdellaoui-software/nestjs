@@ -74,7 +74,14 @@ export class QuestionsService {
       .populate({ path: 'answers', model: 'Answer' })
       .exec();
   }
-
+  async findByUser(userId: string) {
+    return await this.QuestionModel.find({ author: userId })
+      .sort({ createdAt: -1 })
+      .populate({ path: 'techs', model: 'Tech' })
+      .populate('author')
+      .populate({ path: 'answers', model: 'Answer' })
+      .exec();
+  }
   async findOne(id: string) {
     await this.incrementViews(id);
     const question = await this.QuestionModel.findById(id)
