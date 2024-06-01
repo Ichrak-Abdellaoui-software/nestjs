@@ -16,7 +16,7 @@ export class TechsController {
   findAll() {
     return this.service.findAll();
   }
-  @Get('/:id/questions')
+  @Get('/:id')
   findOne(@Param('id') id: string) {
     return this.service.findOne(id);
   }
