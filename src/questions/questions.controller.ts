@@ -24,15 +24,15 @@ export class QuestionsController {
   @Post('/add')
   async add(@Body() body: CreateQuestionDto, @User() user: any) {
     const userId = user._id;
-    console.log(
-      'add post:: ',
-      body,
-      'userId',
-      userId,
-      'role',
-      user.role,
-      user.email,
-    );
+    // console.log(
+    //   'add post:: ',
+    //   body,
+    //   'userId',
+    //   userId,
+    //   'role',
+    //   user.role,
+    //   user.email,
+    // );
     return this.service.add(body, userId);
   }
   @Get() // par plus récente
