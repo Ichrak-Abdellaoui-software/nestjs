@@ -5,12 +5,23 @@ import { User, UserSchema } from './models/users.models';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PolesModule } from '../poles/poles.module';
 import { QuestionsModule } from '../questions/questions.module';
-
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 @Module({
   imports: [
     forwardRef(() => QuestionsModule),
     PolesModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MulterModule.register({
+      storage: multer.diskStorage({
+        destination: './uploads/avatars', // Chemin où les fichiers seront sauvegardés
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${file.fieldname}-${uniqueSuffix}-${file.originalname}`);
+        },
+      }),
+    }),
   ],
   providers: [UsersService],
   controllers: [UsersController],
