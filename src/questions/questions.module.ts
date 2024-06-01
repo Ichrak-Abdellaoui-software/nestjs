@@ -6,6 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TechsModule } from '../techs/techs.module';
 import { UsersModule } from '../users/users.module';
 import { TechSchema } from '../techs/models/techs.models';
+import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -16,7 +18,7 @@ import { TechSchema } from '../techs/models/techs.models';
       { name: Question.name, schema: QuestionSchema },
     ]),
   ],
-  providers: [QuestionsService],
+  providers: [QuestionsService, JwtGuard, JwtStrategy],
   controllers: [QuestionsController],
   exports: [
     QuestionsService,

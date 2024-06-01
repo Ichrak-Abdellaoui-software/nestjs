@@ -7,8 +7,12 @@ import { LikeDto } from './dto/like.dto';
 @Injectable()
 export class LikesService {
   constructor(@InjectModel(Like.name) private likeModel: Model<Like>) {}
-  async add(likeDto: LikeDto): Promise<Like> {
-    const newLike = new this.likeModel(likeDto);
+  async add(likeDto: LikeDto, userId: string): Promise<Like> {
+    const newLikeData = {
+      ...likeDto,
+      createdBy: userId,
+    };
+    const newLike = new this.likeModel(newLikeData);
     return newLike.save();
   }
 

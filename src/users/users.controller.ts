@@ -9,11 +9,14 @@ import {
   Post,
   Put,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './models/users.models';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 export class UsersController {
@@ -50,6 +53,17 @@ export class UsersController {
   update(@Param('id') id: string, @Body() body: UpdateUserDto) {
     return this.service.update(id, body);
   }
+
+  @Put('/:id/avatar')
+  @UseInterceptors(FileInterceptor('avatar'))
+  updateAvatar(
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body('avatar') imageUrl: string,
+  ) {
+    return this.service.updateAvatar(id, file, imageUrl);
+  }
+
   @Delete('/:id')
   delete(@Param('id') id: string) {
     return this.service.delete(id);

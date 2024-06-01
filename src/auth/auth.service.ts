@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
@@ -32,30 +36,34 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
+<<<<<<< HEAD
   
     user = user._doc
     return {
       access_token: this.jwtService.sign(user),
       userData: user
   };
+=======
+
+    user = user._doc;
+    return {
+      access_token: this.jwtService.sign(user),
+      userData: user,
+    };
+>>>>>>> 04720be30e9061b3bc6fc44c49f8c4c378954b03
   }
-  // async changePassword(
-  //   userId: string,
-  //   oldPassword: string,
-  //   newPassword: string,
-  // ): Promise<void> {
-  //   const user = await this.usersService.findOne(userId);
-  //   if (!user) {
-  //     throw new UnauthorizedException('User not found');
-  //   }
+  async changePassword(userId: string, oldPassword: string, newPass: string) {
+    const user = await this.usersService.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-  //   const isMatch = await bcrypt.compare(oldPassword, user.password);
-  //   if (!isMatch) {
-  //     throw new UnauthorizedException('Old password is incorrect');
-  //   }
+    if (!(await bcrypt.compare(oldPassword, user.password))) {
+      throw new UnauthorizedException('Old password is incorrect');
+    }
 
-  //   const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-  //   user.password = hashedNewPassword;
-  //   await user.save();
-  // }
+    user.password = await bcrypt.hash(newPass, 10);
+    await user.save();
+    return { message: 'Password successfully changed' };
+  }
 }

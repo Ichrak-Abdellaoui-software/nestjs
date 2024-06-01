@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   BadRequestException,
   Injectable,
@@ -11,6 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Pole } from '../poles/models/poles.models';
 import { Question } from '../questions/models/questions.models';
+import { createCanvas } from 'canvas';
 
 @Injectable()
 export class UsersService {
@@ -19,13 +21,29 @@ export class UsersService {
     @InjectModel(Pole.name) private PoleModel: Model<Pole>,
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
   ) {}
+  async generateAvatar(initial: string): Promise<string> {
+    const canvas = createCanvas(100, 100);
+    const context = canvas.getContext('2d');
+    //['#B9ACD5', '#180444'],['#044425', '#ADDEC6'],['#E2D810', '#D9138A'],['#12A4D9', '#322514'],['#FE5F55', '#0B4F6C']
+    context.fillStyle = '#D5ACD2';
+    context.fillRect(0, 0, 100, 100);
+    context.fillStyle = '#4B0146';
+    context.font = '48px sans-serif';
+    context.textAlign = 'center';
+    context.fillText(initial.toUpperCase(), 50, 62);
+
+    return canvas.toDataURL();
+  }
   async add(body: CreateUserDto) {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
+      const initial = body.fullname.charAt(0) + body.fullname.charAt(1);
+      const avatarUrl = await this.generateAvatar(initial);
 
       const newUser = new this.UserModel({
         ...body,
         password: hashedPassword,
+        avatar: avatarUrl,
       });
 
       const createdUser = await newUser.save();
@@ -109,7 +127,7 @@ export class UsersService {
 
     return mostPosting;
   }
-
+  ////////////////////////////////////////////////////
   findOne(id: string) {
     //return this.UserModel.findOne({ _id: id });
     return this.UserModel.findById(id);
@@ -130,6 +148,42 @@ export class UsersService {
       { new: true, runValidators: true },
     );
   }
+  async updateAvatar(
+    id: string,
+    file?: Express.Multer.File,
+    imageUrl?: string,
+  ): Promise<User> {
+    try {
+      let avatarUrl: string;
+
+      if (file) {
+        //avatar à telecharger
+        avatarUrl = `/path/to/saved/files/${file.filename}`;
+      } else if (imageUrl) {
+        //avatar a partir d'un lien
+        avatarUrl = imageUrl;
+      } else {
+        throw new BadRequestException('No avatar provided');
+      }
+
+      // Update avatar URL dans la bd
+      const updatedUser = await this.UserModel.findByIdAndUpdate(
+        id,
+        { avatar: avatarUrl },
+        { new: true },
+      );
+
+      if (!updatedUser) {
+        throw new InternalServerErrorException('User not found');
+      }
+
+      return updatedUser;
+    } catch (error) {
+      console.error('Error during avatar update: ', error);
+      throw new InternalServerErrorException('Error updating avatar');
+    }
+  }
+
   search(key: string) {
     const keyword = key ? { name: { $regex: key, $options: 'i' } } : {};
     return this.UserModel.find(keyword);

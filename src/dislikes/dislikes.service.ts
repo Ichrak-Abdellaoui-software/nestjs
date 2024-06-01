@@ -9,8 +9,12 @@ export class DislikesService {
   constructor(
     @InjectModel(Dislike.name) private dislikeModel: Model<Dislike>,
   ) {}
-  async add(likeDto: DislikeDto): Promise<Dislike> {
-    const newDislike = new this.dislikeModel(likeDto);
+  async add(dislikeDto: DislikeDto, userId: string): Promise<Dislike> {
+    const newDislikeData = {
+      ...dislikeDto,
+      createdBy: userId,
+    };
+    const newDislike = new this.dislikeModel(newDislikeData);
     return newDislike.save();
   }
 
