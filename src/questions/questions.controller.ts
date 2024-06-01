@@ -20,14 +20,6 @@ import { User } from '../decorators/user.decorator';
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
-<<<<<<< HEAD
-  @Post('/add')
-  @UseGuards(JwtGuard)
-  async add(@Body() body: CreateQuestionDto, @Req() req: any) {
-    const userId = req.user.userId;
-    console.log("add post:: ",body,userId);
-    
-=======
 
   @Post('/add')
   async add(@Body() body: CreateQuestionDto, @User() user: any) {
@@ -41,7 +33,6 @@ export class QuestionsController {
     //   user.role,
     //   user.email,
     // );
->>>>>>> 04720be30e9061b3bc6fc44c49f8c4c378954b03
     return this.service.add(body, userId);
   }
   @Get() // par plus récente
