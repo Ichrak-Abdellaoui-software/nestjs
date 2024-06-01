@@ -36,21 +36,12 @@ export class AuthService {
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
-<<<<<<< HEAD
-  
-    user = user._doc
-    return {
-      access_token: this.jwtService.sign(user),
-      userData: user
-  };
-=======
 
     user = user._doc;
     return {
       access_token: this.jwtService.sign(user),
       userData: user,
     };
->>>>>>> 04720be30e9061b3bc6fc44c49f8c4c378954b03
   }
   async changePassword(userId: string, oldPassword: string, newPass: string) {
     const user = await this.usersService.findOne(userId);
