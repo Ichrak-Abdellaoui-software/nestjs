@@ -27,17 +27,17 @@ export class AuthService {
   }
 
   async login(loginDto: LoginDto) {
-    const user = await this.validateUser(loginDto.email, loginDto.password);
+    let user = await this.validateUser(loginDto.email, loginDto.password);
+
     if (!user) {
       throw new UnauthorizedException('Invalid email or password');
     }
-    const payload = {
-      email: user.email,
-      sub: user._id,
-    };
+  
+    user = user._doc
     return {
-      access_token: this.jwtService.sign(payload),
-    };
+      access_token: this.jwtService.sign(user),
+      userData: user
+  };
   }
   // async changePassword(
   //   userId: string,

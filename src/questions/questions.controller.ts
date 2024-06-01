@@ -20,10 +20,12 @@ import { JwtGuard } from '../auth/guards/jwt.guard';
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
-  @Post()
+  @Post('/add')
   @UseGuards(JwtGuard)
   async add(@Body() body: CreateQuestionDto, @Req() req: any) {
     const userId = req.user.userId;
+    console.log("add post:: ",body,userId);
+    
     return this.service.add(body, userId);
   }
   @Get() // par plus récente
