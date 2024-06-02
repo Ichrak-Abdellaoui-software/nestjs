@@ -90,7 +90,7 @@ export class AuthService {
     );
 
     const mailOptions = {
-      from: '"Mobistack Support" <support@mobistack.com>',
+      from: '"Mobistock Support" <support@mobistack.com>',
       to: email,
       subject: 'Your Password Reset Request',
       html: `
@@ -106,16 +106,18 @@ export class AuthService {
                   }
                   .email-container {
                       width: 600px;
-                      margin: 0;
+                      margin: auto;
                       background: #FFFFFF;
                       border: 1px solid #DDDDDD;
                       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
                       padding: 40px;
+                      text-align: center; /* Center aligns everything in the container */
                   }
                   .header {
                       color: #0056b3;
                       font-size: 24px;
                       font-weight: 300;
+                      margin-top: 20px; /* Add space between the logo and the header text */
                   }
                   .content-block {
                       background-color: #E8F0FE;
@@ -124,6 +126,7 @@ export class AuthService {
                       border-left: 5px solid #0056b3;
                       margin: 30px 0;
                       font-size: 16px;
+                      text-align: left; /* Keep text alignment to left for the content */
                   }
                   .footer {
                       font-size: 14px;
@@ -134,6 +137,7 @@ export class AuthService {
           </head>
           <body>
               <div class="email-container">
+                  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcSll2--lZ6O0lFdUKyYylHcUK5_megC4hXEgQ&s" alt="Mobistack Logo" style="width: 100px; height: auto; margin-top: 20px;">
                   <h1 class="header">Mobistack Password Reset</h1>
                   <p>Hello,</p>
                   <p>You have initiated a request to reset your password. Please enter the token below to proceed:</p>
