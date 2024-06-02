@@ -16,7 +16,7 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: false }) //, select: true
+  @Prop({ required: false, select: false }) //This ensures that the field is not included in the result when fetching documents
   @MinLength(8)
   password: string;
 
@@ -31,6 +31,8 @@ export class User {
 
   // @Prop({ type: Number, default: 0 })
   // totalApproved: number;
+  @Prop({ type: String, select: false }) // pas selected by default
+  resetToken: string;
 
   @Prop([{ type: Types.ObjectId, ref: Question.name }])
   questions: Types.ObjectId[];

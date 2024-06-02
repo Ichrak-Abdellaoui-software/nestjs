@@ -51,18 +51,18 @@ export class AuthController {
     return { message: 'Password successfully changed' };
   }
 
-  // @Post('forgot-password')
-  // @Public()
-  // async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-  //   return this.authService.forgotPassword(forgotPasswordDto.email);
-  // }
+  @Post('forgot-password')
+  @Public()
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(forgotPasswordDto.email);
+  }
 
-  // @Post('reset-password')
-  // @Public()
-  // async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-  //   return this.authService.resetPassword(
-  //     resetPasswordDto.token,
-  //     resetPasswordDto.newPassword,
-  //   );
-  // }
+  @Post('reset-password')
+  @Public()
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(
+      resetPasswordDto.token,
+      resetPasswordDto.newPassword,
+    );
+  }
 }
