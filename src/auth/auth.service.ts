@@ -8,13 +8,24 @@ import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/logint.dto';
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class AuthService {
+  private transporter: nodemailer.Transporter;
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) {}
+  ) {
+    this.transporter = nodemailer.createTransport({
+      host: 'smtp.example.com',
+      port: 587,
+      auth: {
+        user: 'user@example.com',
+        pass: 'password',
+      },
+    });
+  }
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);

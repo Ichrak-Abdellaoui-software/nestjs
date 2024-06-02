@@ -12,7 +12,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Pole } from '../poles/models/poles.models';
 import { Question } from '../questions/models/questions.models';
-import { createCanvas } from 'canvas';
+import * as Jimp from 'jimp';
 
 @Injectable()
 export class UsersService {
@@ -21,24 +21,72 @@ export class UsersService {
     @InjectModel(Pole.name) private PoleModel: Model<Pole>,
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
   ) {}
-  async generateAvatar(initial: string): Promise<string> {
-    const canvas = createCanvas(100, 100);
-    const context = canvas.getContext('2d');
-    //['#B9ACD5', '#180444'],['#044425', '#ADDEC6'],['#E2D810', '#D9138A'],['#12A4D9', '#322514'],['#FE5F55', '#0B4F6C']
-    context.fillStyle = '#D5ACD2';
-    context.fillRect(0, 0, 100, 100);
-    context.fillStyle = '#4B0146';
-    context.font = '48px sans-serif';
-    context.textAlign = 'center';
-    context.fillText(initial.toUpperCase(), 50, 62);
+  async generateAvatar(initials: string): Promise<string> {
+    const width = 100;
+    const height = 100;
+    const colorPairs = [
+      ['#6a1b9a', '#f3e5f5'], // Améthyste foncé sur fond lilas clair
+      ['#283593', '#ede7f6'], // Indigo foncé sur fond lavande clair
+      ['#d32f2f', '#ffcdd2'], // Rouge fort sur fond rose clair
+      ['#00796b', '#b2dfdb'], // Teal foncé sur fond menthe clair
+      ['#f9a825', '#fffde7'], // Jaune moutarde sur fond jaune très clair
+      ['#c2185b', '#fce4ec'], // Rose profond sur fond rose pâle
+      ['#303f9f', '#c5cae9'], // Bleu roi sur fond bleu pastel
+      ['#0288d1', '#b3e5fc'], // Bleu lumineux sur fond bleu ciel
+      ['#7b1fa2', '#e1bee7'], // Violet foncé sur fond lavande
+      ['#c62828', '#ffccbc'], // Rouge foncé sur fond abricot clair
+      ['#2e7d32', '#a5d6a7'], // Vert sapin sur fond vert tendre
+      ['#ad1457', '#f8bbd0'], // Magenta sur fond rose poudré
+      ['#6a1b9a', '#e1bee7'], // Violet profond sur fond lavande pâle
+      ['#1565c0', '#bbdefb'], // Bleu cobalt sur fond bleu pâle
+      ['#00838f', '#b2ebf2'], // Cyan foncé sur fond cyan clair
+    ];
 
-    return canvas.toDataURL();
+    // Sélection aléatoire d'une paire de couleurs
+    const [backgroundColor, textColor] =
+      colorPairs[Math.floor(Math.random() * colorPairs.length)];
+    const image = new Jimp(width, height, Jimp.cssColorToHex(backgroundColor));
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_64_WHITE); //32
+
+    // Print white text to create a mask
+    const textMask = new Jimp(width, height);
+    textMask.print(
+      font,
+      0,
+      0,
+      {
+        text: initials.toUpperCase(),
+        alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+        alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
+      },
+      width,
+      height,
+    );
+
+    // Créer une image de texte de couleur
+    const textColorImage = new Jimp(
+      width,
+      height,
+      Jimp.cssColorToHex(textColor),
+    );
+    textColorImage.mask(textMask, 0, 0); // Appliquer le masque de texte blanc
+
+    // Superposer l'image de texte coloré sur l'image de fond
+    image.composite(textColorImage, 0, 0, {
+      mode: Jimp.BLEND_SOURCE_OVER,
+      opacityDest: 1,
+      opacitySource: 1,
+    });
+
+    const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+    return `data:image/png;base64,${buffer.toString('base64')}`;
   }
+
   async add(body: CreateUserDto) {
     try {
       const hashedPassword = await bcrypt.hash(body.password, 10);
-      const initial = body.fullname.charAt(0) + body.fullname.charAt(1);
-      const avatarUrl = await this.generateAvatar(initial);
+      const initials = this.getInitials(body.fullname);
+      const avatarUrl = await this.generateAvatar(initials);
 
       const newUser = new this.UserModel({
         ...body,
@@ -47,11 +95,10 @@ export class UsersService {
       });
 
       const createdUser = await newUser.save();
-
       await this.PoleModel.findOneAndUpdate(
         { name: body.pole },
-        { $addToSet: { members: createdUser._id } }, // Use $addToSet to avoid duplicates
-        { new: true, upsert: true }, // Upsert if pole doesn't exist
+        { $addToSet: { members: createdUser._id } },
+        { new: true, upsert: true },
       );
 
       return createdUser;
@@ -62,6 +109,15 @@ export class UsersService {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  getInitials(fullname: string): string {
+    const parts = fullname.trim().split(/\s+/);
+    const initials = parts.map((part) => part[0]).join('');
+    return (
+      initials.substring(0, 2).toUpperCase() ||
+      initials.charAt(0).repeat(2).toUpperCase()
+    );
   }
   findAll() {
     return this.UserModel.find();
