@@ -9,6 +9,10 @@ import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/logint.dto';
 import * as nodemailer from 'nodemailer';
+import { v4 as uuidv4 } from 'uuid';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from 'src/users/models/users.models';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
@@ -16,13 +20,15 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    @InjectModel(User.name) private userModel: Model<User>,
   ) {
     this.transporter = nodemailer.createTransport({
-      host: 'smtp.example.com',
-      port: 587,
+      host: process.env.SMTP_HOST,
+      port: +process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === 'true',
       auth: {
-        user: 'user@example.com',
-        pass: 'password',
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     });
   }
@@ -67,5 +73,102 @@ export class AuthService {
     user.password = await bcrypt.hash(newPass, 10);
     await user.save();
     return { message: 'Password successfully changed' };
+  }
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.userModel.findOne({ email }).lean();
+    if (!user) {
+      throw new NotFoundException('Email does not exist');
+    }
+
+    const resetToken = uuidv4();
+    const resetTokenExpiration = new Date();
+    resetTokenExpiration.setHours(resetTokenExpiration.getHours() + 1); // Token expires after 1 hour
+
+    await this.userModel.updateOne(
+      { _id: user._id },
+      { resetToken, resetTokenExpires: resetTokenExpiration },
+    );
+
+    const mailOptions = {
+      from: '"Mobistack Support" <support@mobistack.com>',
+      to: email,
+      subject: 'Your Password Reset Request',
+      html: `
+          <html>
+          <head>
+              <style>
+                  body {
+                      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                      color: #333333;
+                      background-color: #F4F4F7;
+                      margin: 0;
+                      padding: 0;
+                  }
+                  .email-container {
+                      width: 600px;
+                      margin: 0;
+                      background: #FFFFFF;
+                      border: 1px solid #DDDDDD;
+                      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+                      padding: 40px;
+                  }
+                  .header {
+                      color: #0056b3;
+                      font-size: 24px;
+                      font-weight: 300;
+                  }
+                  .content-block {
+                      background-color: #E8F0FE;
+                      color: #333333;
+                      padding: 20px;
+                      border-left: 5px solid #0056b3;
+                      margin: 30px 0;
+                      font-size: 16px;
+                  }
+                  .footer {
+                      font-size: 14px;
+                      color: #888888;
+                      margin-top: 20px;
+                  }
+              </style>
+          </head>
+          <body>
+              <div class="email-container">
+                  <h1 class="header">Mobistack Password Reset</h1>
+                  <p>Hello,</p>
+                  <p>You have initiated a request to reset your password. Please enter the token below to proceed:</p>
+                  <div class="content-block">
+                      <strong>Token:</strong> ${resetToken}
+                  </div>
+                  <p>Please note, this token is valid for 60 minutes. For your security, do not share this token with anyone.</p>
+                  <p class="footer">Thank you.<br/>Mobistack Support Team</p>
+              </div>
+          </body>
+          </html>
+      `, // HTML body content
+    };
+
+    await this.transporter.sendMail(mailOptions);
+
+    return {
+      message:
+        'Instructions to reset your password have been sent to your email address.',
+    };
+  }
+
+  async resetPassword(
+    token: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    const user = await this.usersService.findByResetToken(token);
+    if (!user) {
+      throw new UnauthorizedException('Invalid or expired reset token');
+    }
+
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = null;
+    await user.save();
+
+    return { message: 'Password has been successfully reset' };
   }
 }

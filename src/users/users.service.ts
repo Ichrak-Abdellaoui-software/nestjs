@@ -5,7 +5,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from './models/users.models';
+import { User, UserDocument } from './models/users.models';
 import { Model } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -190,6 +190,9 @@ export class UsersService {
   }
   async findByEmail(email: string): Promise<User | null> {
     return this.UserModel.findOne({ email }).select('+password').exec();
+  }
+  async findByResetToken(resetToken: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({ resetToken }).exec();
   }
   delete(id: string) {
     return this.UserModel.findByIdAndDelete(id);
