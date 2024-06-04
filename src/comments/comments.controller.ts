@@ -7,19 +7,42 @@ import {
   Post,
   Put,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { User } from 'src/decorators/user.decorator';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('comments')
 export class CommentsController {
   constructor(private readonly service: CommentsService) {}
   @Post()
-  add(@Body() body: CreateCommentDto, @User() user: any) {
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 1 },
+      { name: 'file', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+      { name: 'audio', maxCount: 1 },
+    ]),
+  )
+  add(
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      file?: Express.Multer.File[];
+      video?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    },
+    @Body() body: CreateCommentDto,
+    @User() user: any,
+  ) {
     const userId = user._id;
-    return this.service.add(body, userId);
+    const allFiles = Object.values(files).flat();
+    //console.log(allFiles);
+    return this.service.add(body, userId, allFiles);
   }
   @Get()
   findAll() {

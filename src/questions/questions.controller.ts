@@ -9,21 +9,48 @@ import {
   Post,
   Put,
   Query,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
 import { Question } from './models/questions.models';
 import { User } from '../decorators/user.decorator';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('questions')
 export class QuestionsController {
   constructor(private readonly service: QuestionsService) {}
-
   @Post('/add')
-  async add(@Body() body: CreateQuestionDto, @User() user: any) {
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 5 },
+        { name: 'file', maxCount: 2 },
+        { name: 'video', maxCount: 1 },
+        { name: 'audio', maxCount: 2 },
+      ],
+      { limits: { files: 7 } },
+    ),
+  )
+  add(
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      file?: Express.Multer.File[];
+      video?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    },
+    @Body() body: CreateQuestionDto,
+    @User() user: any,
+  ) {
+    const allFiles = Object.values(files).flat();
+    //console.log(allFiles);
+
     const userId = user._id;
+
     // console.log(
     //   'add post:: ',
     //   body,
@@ -33,7 +60,10 @@ export class QuestionsController {
     //   user.role,
     //   user.email,
     // );
-    return this.service.add(body, userId);
+
+    //console.log(body.techs);
+
+    return this.service.add(body, userId, allFiles);
   }
   @Get() // par plus récente
   findAll() {

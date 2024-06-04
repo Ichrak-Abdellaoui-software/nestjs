@@ -18,11 +18,20 @@ export class CommentsService {
     @InjectModel(User.name) private UserModel: Model<User>,
     private answersService: AnswersService,
   ) {}
-  async add(body: CreateCommentDto, userId: string): Promise<Comment> {
+  async add(
+    body: CreateCommentDto,
+    userId: string,
+    files?: Express.Multer.File[],
+  ): Promise<Comment> {
+    const mediaUrls = files
+      ? files.map((file) => `/uploads/medias/${file.filename}`)
+      : [];
     const newCommentData = {
       ...body,
       author: userId,
+      media: mediaUrls,
     };
+
     const comment = await this.CommentModel.create(newCommentData);
     await this.AnswerModel.findByIdAndUpdate(
       comment.answer,

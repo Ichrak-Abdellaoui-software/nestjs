@@ -14,10 +14,18 @@ export class QuestionsService {
     @InjectModel(Tech.name) private TechModel: Model<Tech>,
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
-  async add(body: CreateQuestionDto, userId: string) {
+  async add(
+    body: CreateQuestionDto,
+    userId: string,
+    files?: Express.Multer.File[],
+  ): Promise<Question> {
+    const mediaUrls = files
+      ? files.map((file) => `/uploads/medias/${file.filename}`)
+      : [];
     const newQuestionData = {
       ...body,
       author: userId,
+      media: mediaUrls,
     };
     const question = await this.QuestionModel.create(newQuestionData);
     await Promise.all(

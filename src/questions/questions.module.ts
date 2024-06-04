@@ -8,6 +8,8 @@ import { UsersModule } from '../users/users.module';
 import { TechSchema } from '../techs/models/techs.models';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
+import { MulterModule } from '@nestjs/platform-express';
+import * as multer from 'multer';
 
 @Module({
   imports: [
@@ -17,6 +19,16 @@ import { JwtStrategy } from 'src/auth/strategy/jwt.strategy';
     MongooseModule.forFeature([
       { name: Question.name, schema: QuestionSchema },
     ]),
+    MulterModule.register({
+      storage: multer.diskStorage({
+        destination: './uploads/medias',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          cb(null, `${file.fieldname}-${uniqueSuffix}-${file.originalname}`);
+        },
+      }),
+    }),
   ],
   providers: [QuestionsService, JwtGuard, JwtStrategy],
   controllers: [QuestionsController],
