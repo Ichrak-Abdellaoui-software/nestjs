@@ -61,6 +61,7 @@ export class UsersController {
     @UploadedFile() file: Express.Multer.File,
     @Body('avatar') imageUrl: string,
   ) {
+    console.log(file, imageUrl);
     return this.service.updateAvatar(id, file, imageUrl);
   }
 

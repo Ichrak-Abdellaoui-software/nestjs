@@ -14,7 +14,7 @@ import * as multer from 'multer';
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MulterModule.register({
       storage: multer.diskStorage({
-        destination: './uploads/avatars', // Chemin où les fichiers seront sauvegardés
+        destination: './uploads/avatars',
         filename: (req, file, cb) => {
           const uniqueSuffix =
             Date.now() + '-' + Math.round(Math.random() * 1e9);

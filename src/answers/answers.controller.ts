@@ -7,19 +7,44 @@ import {
   Post,
   Put,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AnswersService } from './answers.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { User } from 'src/decorators/user.decorator';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('answers')
 export class AnswersController {
   constructor(private readonly service: AnswersService) {}
   @Post()
-  async add(@Body() body: CreateAnswerDto, @User() user: any) {
+  @UseInterceptors(
+    FileFieldsInterceptor(
+      [
+        { name: 'image', maxCount: 1 },
+        { name: 'file', maxCount: 1 },
+        { name: 'video', maxCount: 1 },
+        { name: 'audio', maxCount: 1 },
+      ],
+      { limits: { files: 4 } },
+    ),
+  )
+  async add(
+    @UploadedFiles()
+    files: {
+      image?: Express.Multer.File[];
+      file?: Express.Multer.File[];
+      video?: Express.Multer.File[];
+      audio?: Express.Multer.File[];
+    },
+    @Body() body: CreateAnswerDto,
+    @User() user: any,
+  ) {
     const userId = user._id;
-    return this.service.add(body, userId);
+    const allFiles = Object.values(files).flat();
+    return this.service.add(body, userId, allFiles);
   }
   @Get()
   findAll() {

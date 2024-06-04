@@ -18,11 +18,20 @@ export class AnswersService {
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
     @InjectModel(User.name) private UserModel: Model<User>,
   ) {}
-  async add(body: CreateAnswerDto, userId: string): Promise<Answer> {
+  async add(
+    body: CreateAnswerDto,
+    userId: string,
+    files?: Express.Multer.File[],
+  ): Promise<Answer> {
+    const mediaUrls = files
+      ? files.map((file) => `/uploads/medias/${file.filename}`)
+      : [];
     const newAnswerData = {
       ...body,
       author: userId,
+      media: mediaUrls,
     };
+
     const answer = await this.AnswerModel.create(newAnswerData);
     await this.QuestionModel.findByIdAndUpdate(
       answer.question,
