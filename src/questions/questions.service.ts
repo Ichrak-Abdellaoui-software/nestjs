@@ -49,8 +49,11 @@ export class QuestionsService {
   async findAll() {
     return await this.QuestionModel.find()
       .sort({ createdAt: -1 })
-      .populate({ path: 'techs', model: 'Tech' })
-      .populate('author')
+      .populate({ path: 'techs', select: 'name _id'})
+      .populate({
+        path: 'author',
+        select: 'name avatar _id'
+      })
       .populate({ path: 'answers', model: 'Answer' })
       .exec();
   }
