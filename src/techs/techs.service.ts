@@ -21,7 +21,7 @@ export class TechsService {
     }
   }
   findAll() {
-    return this.TechModel.find();
+    return this.TechModel.find({}, '-questions');
   }
   findOne(id: string) {
     //return this.TechModel.findOne({ _id: id });
