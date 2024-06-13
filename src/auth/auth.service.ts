@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Injectable,
+  Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -16,6 +17,8 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   private transporter: nodemailer.Transporter;
   constructor(
     private usersService: UsersService,
@@ -47,7 +50,7 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto: LoginDto) {
+async login(loginDto: LoginDto) {
     let user = await this.validateUser(loginDto.email, loginDto.password);
 
     if (!user) {

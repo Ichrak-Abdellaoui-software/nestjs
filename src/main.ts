@@ -9,9 +9,12 @@ import {
   ValidationFilter,
 } from './common/utils/filter.validation';
 import { ValidationError } from 'class-validator';
+import { Logger } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: new Logger(),
+  });
   app.setGlobalPrefix(globalVariables.api.globalPrefix); // set global prefix for all routes
   app.enableCors({
     origin: '*',

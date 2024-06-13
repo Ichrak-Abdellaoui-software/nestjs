@@ -95,8 +95,14 @@ export class QuestionsService {
     const question = await this.QuestionModel.findById(id)
       .populate({ path: 'techs', model: 'Tech' })
       .populate('author')
-      .populate({ path: 'answers', model: 'Answer' })
-      .exec();
+      .populate({ path: 'answers', model: 'Answer' });
+
+    if (!question) {
+      throw new NotFoundException(`Question with id ${id} not found`);
+    }
+
+    question.views += 1;
+    await question.save();
     return question;
   }
   delete(id: string) {

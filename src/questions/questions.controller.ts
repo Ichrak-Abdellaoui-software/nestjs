@@ -35,7 +35,7 @@ export class QuestionsController {
       { limits: { files: 7 } },
     ),
   )
-  add(
+  async add(
     @UploadedFiles()
     files: {
       image?: Express.Multer.File[];
@@ -43,28 +43,16 @@ export class QuestionsController {
       video?: Express.Multer.File[];
       audio?: Express.Multer.File[];
     },
-    @Body() body: CreateQuestionDto,
+    @Body('jsonData') jsonData: string,
     @User() user: any,
   ) {
+    const body: CreateQuestionDto = JSON.parse(jsonData);
     const allFiles = Object.values(files).flat();
-    //console.log(allFiles);
-
     const userId = user._id;
-
-    // console.log(
-    //   'add post:: ',
-    //   body,
-    //   'userId',
-    //   userId,
-    //   'role',
-    //   user.role,
-    //   user.email,
-    // );
-
-    //console.log(body.techs);
-
+  
     return this.service.add(body, userId, allFiles);
   }
+  
   @Get() // par plus récente
   findAll() {
     return this.service.findAll();
