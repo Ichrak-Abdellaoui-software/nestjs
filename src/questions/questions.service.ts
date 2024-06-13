@@ -52,7 +52,7 @@ export class QuestionsService {
       .populate({ path: 'techs', select: 'name _id'})
       .populate({
         path: 'author',
-        select: 'name avatar _id'
+        select: 'name avatar _id fullname'
       })
       .populate({ path: 'answers', model: 'Answer' })
       .exec();
@@ -104,7 +104,6 @@ export class QuestionsService {
       throw new NotFoundException(`Question with id ${id} not found`);
     }
 
-    question.views += 1;
     await question.save();
     return question;
   }
