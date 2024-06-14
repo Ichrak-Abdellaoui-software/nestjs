@@ -52,7 +52,11 @@ export class QuestionsController {
   
     return this.service.add(body, userId, allFiles);
   }
-  
+  @Get('/top-viewed')
+  getTopViewedQuestions(): Promise<Question[]> {
+    return this.service.getTopViewedQuestions();
+  }
+ 
   @Get() // par plus récente
   findAll() {
     return this.service.findAll();

@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Patch,
   Post,
   Put,
   Query,
@@ -91,15 +92,15 @@ export class AnswersController {
   //   return { dislikes };
   // }
 
-  // @Patch('/:id/approve')
-  // async approve(@Param('id') id: string) {
-  //   const answer = await this.service.approveAnswer(id);
-  //   return answer;
-  // }
+  @Patch('/:id/approve')
+  async approve(@Param('id') id: string) {
+    const answer = await this.service.approveAnswer(id);
+    return answer;
+  }
 
-  // @Patch('/:id/disapprove')
-  // async disapprove(@Param('id') id: string) {
-  //   const answer = await this.service.disapproveAnswer(id);
-  //   return answer;
-  // }
+  @Patch('/:id/disapprove')
+  async disapprove(@Param('id') id: string) {
+    const answer = await this.service.disapproveAnswer(id);
+    return answer;
+  }
 }

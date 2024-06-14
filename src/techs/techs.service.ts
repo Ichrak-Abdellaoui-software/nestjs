@@ -5,7 +5,6 @@ import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { TechDto } from './dto/techs.dto';
 import { UpdateTechDto } from './dto/update-tech.dto';
-
 @Injectable()
 export class TechsService {
   constructor(@InjectModel(Tech.name) private TechModel: Model<Tech>) {}
@@ -24,8 +23,16 @@ export class TechsService {
     return this.TechModel.find({}, '-questions');
   }
   findOne(id: string) {
-    //return this.TechModel.findOne({ _id: id });
-    return this.TechModel.findById(id);
+    return this.TechModel.findById(id)
+      .populate({
+        path: 'questions',
+        model: 'Question',
+        populate: {
+          path: 'author',
+          model: 'User',
+        },
+      })
+      .exec();
   }
   delete(id: string) {
     return this.TechModel.findByIdAndDelete({ _id: id });

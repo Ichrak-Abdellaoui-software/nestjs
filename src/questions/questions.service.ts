@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Question } from './models/questions.models';
 import { Model } from 'mongoose';
@@ -9,6 +9,7 @@ import { User } from '../users/models/users.models';
 
 @Injectable()
 export class QuestionsService {
+  private readonly logger = new Logger(QuestionsService.name);
   constructor(
     @InjectModel(Question.name) private QuestionModel: Model<Question>,
     @InjectModel(Tech.name) private TechModel: Model<Tech>,
@@ -49,12 +50,15 @@ export class QuestionsService {
   async findAll() {
     return await this.QuestionModel.find()
       .sort({ createdAt: -1 })
-      .populate({ path: 'techs', select: 'name _id'})
+      .populate({ path: 'techs', select: 'name _id' })
       .populate({
         path: 'author',
-        select: 'name avatar _id fullname'
+        select: 'name avatar _id fullname',
       })
       .populate({ path: 'answers', model: 'Answer' })
+      .select(
+        'title author description techs status views answers createdAt updatedAt media',
+      )
       .exec();
   }
   //sorted by plus ancienne
@@ -97,7 +101,7 @@ export class QuestionsService {
     await this.incrementViews(id);
     const question = await this.QuestionModel.findById(id)
       .populate({ path: 'techs', model: 'Tech' })
-      .populate('author')
+      .populate({ path: 'author', select: 'fullname avatar pole _id' })
       .populate({ path: 'answers', model: 'Answer' });
 
     if (!question) {
@@ -149,5 +153,13 @@ export class QuestionsService {
 
     // return question;
     return question.views;
+  }
+
+  async getTopViewedQuestions(): Promise<Question[]> {
+    return this.QuestionModel.find()
+      .sort({ views: -1 }) // Sort by views in descending order
+      .limit(5) // Limit to top 5
+      .populate({ path: 'answers', select: 'title _id' }) // Populate answers, selecting only title and _id
+      .exec();
   }
 }

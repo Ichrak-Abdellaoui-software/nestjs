@@ -160,77 +160,77 @@ export class AnswersService {
   //   return answer.dislikes;
   // }
 
-  // async approveAnswer(answerId: string): Promise<Answer> {
-  //   const answer = await this.AnswerModel.findById(answerId);
+  async approveAnswer(answerId: string): Promise<Answer> {
+    const answer = await this.AnswerModel.findById(answerId);
 
-  //   if (!answer) {
-  //     throw new BadRequestException('Answer not found');
-  //   }
-  //   if (answer.status === AnswerStatus.APPROVED) {
-  //     throw new BadRequestException('This answer is already approved');
-  //   }
-  //   answer.status = AnswerStatus.APPROVED;
-  //   await answer.save();
+    if (!answer) {
+      throw new BadRequestException('Answer not found');
+    }
+    if (answer.status === AnswerStatus.APPROVED) {
+      throw new BadRequestException('This answer is already approved');
+    }
+    answer.status = AnswerStatus.APPROVED;
+    await answer.save();
 
-  //   if (answer.author) {
-  //     await this.UserModel.findByIdAndUpdate(
-  //       answer.author,
-  //       { $inc: { totalApproved: 1 } },
-  //       { new: true },
-  //     );
-  //   }
-  //   await this.QuestionModel.findByIdAndUpdate(
-  //     answer.question,
-  //     { $set: { status: QuestionStatus.CLOSED } },
-  //     { new: true },
-  //   );
-  //   return answer;
-  // }
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalApproved: 1 } },
+        { new: true },
+      );
+    }
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: QuestionStatus.CLOSED } },
+      { new: true },
+    );
+    return answer;
+  }
 
-  // async disapproveAnswer(answerId: string): Promise<Answer> {
-  //   const answer = await this.AnswerModel.findById(answerId);
-  //   if (!answer) {
-  //     throw new BadRequestException('Answer not found');
-  //   }
-  //   if (answer.status !== AnswerStatus.APPROVED) {
-  //     throw new BadRequestException(
-  //       'Cannot disapprove an answer that is not approved',
-  //     );
-  //   }
-  //   answer.status = AnswerStatus.DISAPPROVED;
-  //   await answer.save();
-  //   if (answer.author) {
-  //     await this.UserModel.findByIdAndUpdate(
-  //       answer.author,
-  //       { $inc: { totalApproved: -1 } },
-  //       { new: true },
-  //     );
-  //   }
-  //   await this.QuestionModel.findByIdAndUpdate(
-  //     answer.question,
-  //     { $set: { status: QuestionStatus.OPEN } },
-  //     { new: true },
-  //   );
-  //   return answer;
-  // }
-  // async handleQuestionStatus(
-  //   answerId: Types.ObjectId,
-  //   status: CommentStatus,
-  // ): Promise<void> {
-  //   const answer = await this.AnswerModel.findById(answerId).select('question');
-  //   if (!answer) {
-  //     throw new BadRequestException('Answer not found');
-  //   }
+  async disapproveAnswer(answerId: string): Promise<Answer> {
+    const answer = await this.AnswerModel.findById(answerId);
+    if (!answer) {
+      throw new BadRequestException('Answer not found');
+    }
+    if (answer.status !== AnswerStatus.APPROVED) {
+      throw new BadRequestException(
+        'Cannot disapprove an answer that is not approved',
+      );
+    }
+    answer.status = AnswerStatus.DISAPPROVED;
+    await answer.save();
+    if (answer.author) {
+      await this.UserModel.findByIdAndUpdate(
+        answer.author,
+        { $inc: { totalApproved: -1 } },
+        { new: true },
+      );
+    }
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: QuestionStatus.OPEN } },
+      { new: true },
+    );
+    return answer;
+  }
+  async handleQuestionStatus(
+    answerId: Types.ObjectId,
+    status: CommentStatus,
+  ): Promise<void> {
+    const answer = await this.AnswerModel.findById(answerId).select('question');
+    if (!answer) {
+      throw new BadRequestException('Answer not found');
+    }
 
-  //   const newQuestionStatus =
-  //     status === CommentStatus.APPROVED
-  //       ? QuestionStatus.CLOSED
-  //       : QuestionStatus.OPEN;
+    const newQuestionStatus =
+      status === CommentStatus.APPROVED
+        ? QuestionStatus.CLOSED
+        : QuestionStatus.OPEN;
 
-  //   await this.QuestionModel.findByIdAndUpdate(
-  //     answer.question,
-  //     { $set: { status: newQuestionStatus } },
-  //     { new: true },
-  //   );
-  // }
+    await this.QuestionModel.findByIdAndUpdate(
+      answer.question,
+      { $set: { status: newQuestionStatus } },
+      { new: true },
+    );
+  }
 }
