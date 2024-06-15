@@ -53,7 +53,11 @@ export class QuestionsService {
       .populate({ path: 'techs', select: 'name _id' })
       .populate({
         path: 'author',
-        select: 'name avatar _id fullname',
+        model: 'User',
+        populate: {
+          path: 'pole',
+          select: 'name _id',
+        },
       })
       .populate({ path: 'answers', model: 'Answer' })
       .select(
