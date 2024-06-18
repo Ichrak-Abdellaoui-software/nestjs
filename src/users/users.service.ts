@@ -185,8 +185,12 @@ export class UsersService {
   }
   ////////////////////////////////////////////////////
   findOne(id: string) {
-    //return this.UserModel.findOne({ _id: id });
-    return this.UserModel.findById(id);
+    return this.UserModel.findById(id)
+      .populate({
+        path: 'pole',
+        select: 'name',
+      })
+      .exec(); // Execute the query
   }
   async findByEmail(email: string): Promise<User | null> {
     return this.UserModel.findOne({ email }).select('+password').exec();

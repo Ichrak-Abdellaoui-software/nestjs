@@ -63,9 +63,31 @@ export class SavesService {
   }
   async findUserSaves(userId: string) {
     const userObjectId = new Types.ObjectId(userId);
-    return this.SaveModel.find({ userId: userObjectId })
-      .select('_id')
-      .populate({ path: 'questionId', select: '_id' })
+    return this.SaveModel.find({ userId: userObjectId }, 'questionId -_id')
+      .populate({
+        path: 'questionId',
+        model: 'Question',
+        populate: [
+          {
+            path: 'techs',
+            select: 'name _id',
+          },
+          {
+            path: 'author',
+            model: 'User',
+            populate: {
+              path: 'pole',
+              select: 'name _id',
+            },
+          },
+          {
+            path: 'answers',
+            model: 'Answer',
+          },
+        ],
+        select:
+          'title author description techs status views answers createdAt updatedAt media',
+      })
       .exec();
   }
 

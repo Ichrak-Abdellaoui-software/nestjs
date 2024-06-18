@@ -49,14 +49,14 @@ export class QuestionsController {
     const body: CreateQuestionDto = JSON.parse(jsonData);
     const allFiles = Object.values(files).flat();
     const userId = user._id;
-  
+
     return this.service.add(body, userId, allFiles);
   }
   @Get('/top-viewed')
   getTopViewedQuestions(): Promise<Question[]> {
     return this.service.getTopViewedQuestions();
   }
- 
+
   @Get() // par plus récente
   findAll() {
     return this.service.findAll();
@@ -82,6 +82,10 @@ export class QuestionsController {
   @Get('/mine')
   findByUser(@User() user: any) {
     return this.service.findByUser(user._id);
+  }
+  @Get('/byUserId/:id')
+  findByUserId(@Param('id') id: string) {
+    return this.service.findByUser(id);
   }
   @Get('/:id')
   findOne(@Param('id') id: string) {

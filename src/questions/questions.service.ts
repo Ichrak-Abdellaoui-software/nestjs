@@ -96,9 +96,19 @@ export class QuestionsService {
   async findByUser(userId: string) {
     return await this.QuestionModel.find({ author: userId })
       .sort({ createdAt: -1 })
-      .populate({ path: 'techs', model: 'Tech' })
-      .populate('author')
+      .populate({ path: 'techs', select: 'name _id' })
+      .populate({
+        path: 'author',
+        model: 'User',
+        populate: {
+          path: 'pole',
+          select: 'name _id',
+        },
+      })
       .populate({ path: 'answers', model: 'Answer' })
+      .select(
+        'title author description techs status views answers createdAt updatedAt media',
+      )
       .exec();
   }
   async findOne(id: string) {
